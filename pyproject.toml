@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "manifoldbot"
+version = "0.1.0"
+description = "A self-contained Python module for creating intelligent trading bots that monitor data sources, analyze content with ChatGPT, and automatically trade on Manifold Markets"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Peter Cotton", email = "peter@example.com"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "feedparser>=6.0.10",
+    "pydantic>=2.5.0",
+    "pyyaml>=6.0.1",
+    "openai>=1.3.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.7.0",
+]
+translate = [
+    "deepl>=1.12.0",
+    "googletrans==4.0.0rc1",
+]
+cli = [
+    "rich>=13.7.0",
+    "click>=8.1.0",
+]
+all = [
+    "manifoldbot[dev,translate,cli]",
+]
+
+[project.urls]
+Homepage = "https://github.com/petercotton/manifoldbot"
+Repository = "https://github.com/petercotton/manifoldbot"
+Issues = "https://github.com/petercotton/manifoldbot/issues"
+
+[project.scripts]
+manifoldbot = "manifoldbot.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["manifoldbot*"]
+
+[tool.setuptools.package-data]
+manifoldbot = ["config/*.yaml", "config/*.yml"]
