@@ -9,9 +9,10 @@ __version__ = "0.1.0"
 __author__ = "Peter Cotton"
 __email__ = "peter@example.com"
 
+from .config.settings import load_config
+
 # Core imports - these will be available when someone does `import manifoldbot`
 from .core.bot import Bot
-from .config.settings import load_config
 from .manifold.reader import ManifoldReader
 
 # Main exports
