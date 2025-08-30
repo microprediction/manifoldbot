@@ -213,166 +213,24 @@ class ManifoldWriter(ManifoldReader):
 
         return self._make_authenticated_request("POST", f"market/{market_id}/close", data=data)
 
-    # Position management
 
-    def get_positions(self, market_id: Optional[str] = None) -> List[Dict[str, Any]]:
-        """
-        Get user positions.
-
-        Args:
-            market_id: Optional market ID to filter positions
-
-        Returns:
-            List of positions
-        """
-        endpoint = "positions"
-        if market_id:
-            endpoint = f"positions/{market_id}"
-
-        return self._make_authenticated_request("GET", endpoint)
-
-    def get_portfolio(self) -> Dict[str, Any]:
-        """
-        Get user portfolio summary.
-
-        Returns:
-            Portfolio data
-        """
-        return self._make_authenticated_request("GET", "portfolio")
-
-    # Comment operations
-
-    def post_comment(self, market_id: str, text: str, reply_to: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Post a comment on a market.
-
-        Args:
-            market_id: Market ID
-            text: Comment text
-            reply_to: Optional parent comment ID
-
-        Returns:
-            Posted comment data
-        """
-        if not text.strip():
-            raise ValueError("Comment text cannot be empty")
-
-        data = {"contractId": market_id, "text": text}
-
-        if reply_to:
-            data["replyToCommentId"] = reply_to
-
-        return self._make_authenticated_request("POST", "comment", data=data)
-
-    # User operations
 
     def get_me(self) -> Dict[str, Any]:
-        """
-        Get current user information.
-
-        Returns:
-            User data
-        """
+        """Get current user information."""
         return self._make_authenticated_request("GET", "me")
 
-    def update_user(self, **kwargs) -> Dict[str, Any]:
-        """
-        Update user profile.
-
-        Args:
-            **kwargs: User fields to update
-
-        Returns:
-            Updated user data
-        """
-        return self._make_authenticated_request("POST", "me", data=kwargs)
-
-    # Advanced trading operations
-
-    def calculate_market_impact(self, market_id: str, amount: float, outcome: str) -> Dict[str, Any]:
-        """
-        Calculate the market impact of a potential bet.
-
-        Args:
-            market_id: Market ID
-            amount: Bet amount
-            outcome: "YES" or "NO"
-
-        Returns:
-            Market impact analysis
-        """
-        # Get current market state
-        market = self.get_market(market_id)
-
-        # This is a simplified calculation
-        # In practice, you'd want to use the actual market impact formula
-        current_prob = market.get("probability", 0.5)
-        liquidity = market.get("totalLiquidity", 1000)
-
-        # Simple market impact estimation
-        impact = amount / liquidity if liquidity > 0 else 0
-
-        return {
-            "current_probability": current_prob,
-            "estimated_impact": impact,
-            "new_probability": min(1, max(0, current_prob + impact if outcome == "YES" else current_prob - impact)),
-            "liquidity": liquidity,
-        }
-
-    def place_bet_with_impact_limit(
-        self, market_id: str, outcome: str, amount: float, max_impact: float = 0.05
-    ) -> Dict[str, Any]:
-        """
-        Place a bet with a maximum market impact limit.
-
-        Args:
-            market_id: Market ID
-            outcome: "YES" or "NO"
-            amount: Desired bet amount
-            max_impact: Maximum allowed market impact (0-1)
-
-        Returns:
-            Bet placement result
-        """
-        impact_analysis = self.calculate_market_impact(market_id, amount, outcome)
-
-        if impact_analysis["estimated_impact"] > max_impact:
-            # Reduce bet size to stay within impact limit
-            max_amount = max_impact * impact_analysis["liquidity"]
-            amount = min(amount, max_amount)
-            self.logger.warning(f"Reduced bet size to {amount} to stay within impact limit")
-
-        return self.place_bet(market_id, outcome, amount)
-
-    # Utility methods
-
     def get_balance(self) -> float:
-        """
-        Get current user balance.
-
-        Returns:
-            Current balance in M$
-        """
+        """Get current user balance."""
         user_data = self.get_me()
         return user_data.get("balance", 0.0)
 
     def get_total_deposits(self) -> float:
-        """
-        Get total deposits.
-
-        Returns:
-            Total deposits in M$
-        """
+        """Get total deposits."""
         user_data = self.get_me()
         return user_data.get("totalDeposits", 0.0)
 
     def is_authenticated(self) -> bool:
-        """
-        Check if the writer is properly authenticated.
-
-        Returns:
-            True if authenticated, False otherwise
-        """
+        """Check if properly authenticated."""
         try:
             self.get_me()
             return True

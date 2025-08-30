@@ -121,8 +121,8 @@ Authenticated access for trading and market management (API key required).
 
 - `get_balance()` - Get current balance
 - `get_total_deposits()` - Get total deposits
-- `get_portfolio()` - Get portfolio summary
-- `get_positions(market_id=None)` - Get user positions
+- `get_portfolio()` - Get portfolio summary (simplified from user data)
+- `get_positions(market_id=None)` - Get user positions (returns empty list - API not available)
 
 #### Market Management
 
@@ -196,12 +196,17 @@ except ValueError as e:
 Run the test suite:
 
 ```bash
-# Unit tests
+# Unit tests (mocked API calls)
 pytest tests/
 
 # Real API tests (requires API key)
 pytest tests/manifold/test_reader_real.py tests/manifold/test_writer_real.py
+
+# Test examples to ensure they stay up-to-date
+pytest tests/test_examples.py
 ```
+
+**Note:** The project is tested on Python 3.12. All examples are tested to ensure they work with the current API.
 
 ## Contributing
 
