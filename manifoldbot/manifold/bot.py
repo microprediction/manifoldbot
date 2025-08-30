@@ -222,21 +222,27 @@ class ManifoldBot:
         limit: int = 20,
         bet_amount: int = 10,
         max_bets: int = 5,
-        delay_between_bets: float = 1.0
+        delay_between_bets: float = 1.0,
+        username: str = "MikhailTal"
     ) -> TradingSession:
         """
-        Run the bot on recent markets.
+        Run the bot on markets by a specific user (defaults to MikhailTal).
         
         Args:
-            limit: Number of recent markets to analyze
+            limit: Number of markets to analyze (ignored, gets all user markets)
             bet_amount: Amount to bet per market
             max_bets: Maximum number of bets to place
             delay_between_bets: Delay between bets in seconds
+            username: Username to get markets from (default: "MikhailTal")
             
         Returns:
             TradingSession object
         """
-        markets = self.reader.get_markets(limit=limit)
+        # Get all markets by the specified user (defaults to MikhailTal)
+        markets = self.reader.get_all_markets(username=username)
+        # Limit to the specified number if requested
+        if limit and len(markets) > limit:
+            markets = markets[:limit]
         return self.run_on_markets(markets, bet_amount, max_bets, delay_between_bets)
     
     def run_on_user_markets(
@@ -252,7 +258,7 @@ class ManifoldBot:
         
         Args:
             username: Username to get markets from (default: "MikhailTal")
-            limit: Number of markets to analyze
+            limit: Number of markets to analyze (0 = all user markets)
             bet_amount: Amount to bet per market
             max_bets: Maximum number of bets to place
             delay_between_bets: Delay between bets in seconds
@@ -263,24 +269,15 @@ class ManifoldBot:
         self.logger.info(f"Getting markets created by user: {username}")
         
         try:
-            # Get the user ID from username
-            user = self.reader.get_user(username)
-            user_id = user.get("id")
-            if not user_id:
-                error_msg = f"Could not find user ID for username: {username}"
-                self.logger.error(error_msg)
-                return TradingSession(
-                    markets_analyzed=0,
-                    bets_placed=0,
-                    initial_balance=self.writer.get_balance(),
-                    final_balance=self.writer.get_balance(),
-                    decisions=[],
-                    errors=[error_msg]
-                )
-            
-            # Get markets created by this user
-            markets = self.reader.get_user_markets(user_id, limit=limit)
+            # Get all markets created by this user using the working method
+            markets = self.reader.get_all_markets(username=username)
             self.logger.info(f"Found {len(markets)} markets created by {username}")
+            
+            # Limit to the specified number if requested
+            if limit and len(markets) > limit:
+                markets = markets[:limit]
+                self.logger.info(f"Limited to {len(markets)} markets for analysis")
+            
             return self.run_on_markets(markets, bet_amount, max_bets, delay_between_bets)
             
         except Exception as e:
