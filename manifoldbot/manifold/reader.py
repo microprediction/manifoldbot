@@ -209,7 +209,7 @@ class ManifoldReader:
         if username is None:
             username = "MikhailTal"
         
-        print(f"Fetching ALL markets and filtering by creator: {username}...")
+        print(f"Fetching markets by {username}...")
         
         # Get all markets using proper pagination with 'before' parameter
         all_markets = []
@@ -218,8 +218,6 @@ class ManifoldReader:
         before_cursor = None
         
         while True:
-            print(f"  Page {page}: ", end="", flush=True)
-            
             # Build params for this page
             params = {"limit": limit}
             if before_cursor:
@@ -236,15 +234,16 @@ class ManifoldReader:
                 markets = []
             
             if not markets:
-                print("No more markets")
                 break
                 
             all_markets.extend(markets)
-            print(f"Got {len(markets)} markets (Total: {len(all_markets)})")
+            
+            # Show progress every 10 pages
+            if page % 10 == 0:
+                print(f"  Fetched {len(all_markets)} markets so far...")
             
             # If we got fewer than the limit, we've reached the end
             if len(markets) < limit:
-                print("  Reached end of markets")
                 break
                 
             # Use the last market's ID as the cursor for next request
@@ -253,7 +252,6 @@ class ManifoldReader:
             
             # Safety check to avoid infinite loops
             if page > 100:  # Max 100 pages = 100k markets
-                print("  Stopping at 100 pages for safety")
                 break
         
         # Filter by creator name - be more precise

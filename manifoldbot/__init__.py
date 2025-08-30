@@ -5,7 +5,7 @@ This package provides a framework for creating bots that monitor data sources,
 analyze content with ChatGPT, and automatically trade on Manifold Markets.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.2.1"
 __author__ = "Peter Cotton"
 __email__ = "peter@example.com"
 
