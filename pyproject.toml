@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "manifoldbot"
-version = "0.1.0"
+version = "0.1.1"
 description = "A self-contained Python module for creating intelligent trading bots that monitor data sources, analyze content with ChatGPT, and automatically trade on Manifold Markets"
 readme = "README.md"
 license = {file = "LICENSE"}
