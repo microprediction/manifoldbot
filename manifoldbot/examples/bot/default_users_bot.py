@@ -42,7 +42,12 @@ def main():
             "JoshDreckmeyr",   # frequent, clearly resolved gold (XAU/USD) price markets
             "strutheo",        # longer-horizon gold markets framed for max price by date
             "postjawline",     # materials/science angles that touch copper
-            "MikhailTal"       # chess and other markets
+            "MikhailTal",      # chess and other markets
+            "trevortaylor",    # additional user
+            "neweconomicplan", # electric vehicles, energy policy, automotive, politics
+            "kian_spire",      # technology, cars, electric vehicles, global EV trends
+            "mndrix",          # business, law & order, Tesla, US policy, cars
+            "Philip3773733"    # technology, Tesla, cars, Norway, EV adoption
         ]
         print("📋 Using default user list (no config file found)")
     
@@ -76,7 +81,8 @@ def main():
             max_bets_per_user=1,
             max_total_bets=4,
             delay_between_bets=3.0,
-            markets_per_user=3
+            markets_per_user=3,
+            filter_metals_only=True  # Only trade on metals/commodities markets
         )
         
         # Print results

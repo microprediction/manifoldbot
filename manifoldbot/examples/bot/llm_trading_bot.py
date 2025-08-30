@@ -37,15 +37,34 @@ def main(trade_all=False):
     )
     
     if trade_all:
-        # Trade ALL markets
-        reader = ManifoldReader()
-        print("Fetching ALL markets (this will take a moment)...")
-        markets = reader.get_all_markets()
-        print(f"Found {len(markets)} total markets")
-        session = bot.run_on_markets(
-            markets=markets,
+        # Trade ALL markets from monitored users
+        from pathlib import Path
+        import yaml
+        
+        # Load users from config
+        config_path = Path(__file__).parent / "monitored_users.yaml"
+        if config_path.exists():
+            with open(config_path, 'r') as f:
+                config = yaml.safe_load(f)
+            users_to_monitor = config.get('users', [])
+        else:
+            # Fallback to default list
+            users_to_monitor = [
+                "BoltonBailey", "JoshDreckmeyr", "strutheo", "postjawline", "MikhailTal", "trevortaylor",
+                "neweconomicplan", "kian_spire", "mndrix", "Philip3773733"
+            ]
+        
+        print(f"Fetching ALL markets from {len(users_to_monitor)} monitored users...")
+        print(f"Users: {', '.join(users_to_monitor)}")
+        
+        session = bot.run_on_monitored_users(
+            usernames=users_to_monitor,
             bet_amount=5,
-            max_bets=50
+            max_bets_per_user=None,  # No limit on bets per user
+            max_total_bets=None,     # No limit on total bets
+            delay_between_bets=1.0,
+            markets_per_user=None,   # Check all markets per user
+            filter_metals_only=True  # Only trade on metals/commodities markets
         )
     else:
         # Run on recent markets

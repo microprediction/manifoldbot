@@ -7,7 +7,7 @@ Based on oreacle-bot client patterns with improved pagination handling.
 
 import logging
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 
@@ -201,23 +201,32 @@ class ManifoldReader:
         params = filters or {}
         return self._paginate("markets", params=params, limit=limit)
 
-    def get_all_markets(self, username: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_all_markets(self, usernames: Optional[Union[str, List[str]]] = None) -> Union[List[Dict[str, Any]], Dict[str, List[Dict[str, Any]]]]:
         """
-        Get ALL markets by a specific user (defaults to MikhailTal).
+        Get ALL markets by specific user(s).
         
         Since the API doesn't support filtering by creator, this method fetches
         all markets and filters them client-side by creator name.
         
         Args:
-            username: Username to filter by. Defaults to "MikhailTal" if not provided
+            usernames: Username(s) to filter by. Can be a single string or list of strings.
+                      Defaults to "MikhailTal" if not provided
             
         Returns:
-            List of ALL markets created by the specified user
+            If single username: List of ALL markets created by the specified user
+            If multiple usernames: Dict mapping username to list of their markets
         """
-        if username is None:
-            username = "MikhailTal"
+        if usernames is None:
+            usernames = "MikhailTal"
         
-        print(f"Fetching markets by {username}...")
+        # Normalize to list
+        if isinstance(usernames, str):
+            usernames = [usernames]
+            return_single = True
+        else:
+            return_single = False
+        
+        print(f"Fetching markets by {', '.join(usernames)}...")
         
         # Get all markets using proper pagination with 'before' parameter
         all_markets = []
@@ -262,21 +271,32 @@ class ManifoldReader:
             if page > 100:  # Max 100 pages = 100k markets
                 break
         
-        # Filter by creator name - be more precise
-        user_markets = [
-            m for m in all_markets 
-            if m.get('creatorUsername') == username
-        ]
-        
-        # If no matches by username, try by creator name
-        if not user_markets:
-            user_markets = [
+        # Filter by creator names
+        user_markets = {}
+        for username in usernames:
+            # Filter by creator username first
+            markets = [
                 m for m in all_markets 
-                if m.get('creatorName') == username
+                if m.get('creatorUsername') == username
             ]
+            
+            # If no matches by username, try by creator name
+            if not markets:
+                markets = [
+                    m for m in all_markets 
+                    if m.get('creatorName') == username
+                ]
+            
+            user_markets[username] = markets
+            print(f"✅ Found {len(markets)} markets by {username}")
         
-        print(f"✅ Found {len(user_markets)} markets by {username} out of {len(all_markets)} total markets")
-        return user_markets
+        print(f"Total markets fetched: {len(all_markets)}")
+        
+        # Return format based on input
+        if return_single:
+            return user_markets[usernames[0]]
+        else:
+            return user_markets
 
 
 

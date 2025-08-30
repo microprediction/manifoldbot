@@ -15,6 +15,89 @@ from .writer import ManifoldWriter
 from .lmsr import LMSRCalculator
 
 
+def is_metals_commodities_market(market: Dict[str, Any]) -> bool:
+    """
+    Check if a market is related to metals, commodities, or things that might impact them.
+    
+    Args:
+        market: Market data dictionary
+        
+    Returns:
+        True if market is related to metals/commodities, False otherwise
+    """
+    question = market.get('question', '').lower()
+    description = market.get('description', '').lower()
+    tags = [tag.lower() for tag in market.get('tags', [])]
+    
+    # Keywords related to metals and commodities
+    metals_keywords = [
+        'gold', 'silver', 'copper', 'lithium', 'nickel', 'zinc', 'aluminum', 'aluminium',
+        'platinum', 'palladium', 'rhodium', 'iron', 'steel', 'tin', 'lead', 'cobalt',
+        'uranium', 'rare earth', 'precious metal', 'base metal', 'industrial metal',
+        'manganese', 'chromium', 'molybdenum', 'tungsten', 'titanium', 'vanadium'
+    ]
+    
+    commodities_keywords = [
+        'oil', 'crude', 'gas', 'natural gas', 'petroleum', 'energy', 'coal',
+        'wheat', 'corn', 'soybean', 'rice', 'sugar', 'coffee', 'cocoa',
+        'cotton', 'lumber', 'rubber', 'commodity', 'commodities'
+    ]
+    
+    # EV, green revolution, and battery keywords that impact metals
+    ev_green_keywords = [
+        'electric vehicle', 'ev', 'tesla', 'battery', 'lithium ion', 'lithium-ion',
+        'green energy', 'renewable energy', 'solar', 'wind power', 'hydroelectric',
+        'energy storage', 'grid storage', 'power storage', 'charging station',
+        'electric car', 'electric truck', 'electric bus', 'hybrid vehicle',
+        'fuel cell', 'hydrogen', 'clean energy', 'carbon neutral', 'net zero',
+        'energy transition', 'electrification', 'green revolution', 'sustainability',
+        'climate change', 'emissions', 'carbon', 'greenhouse gas', 'decarbonization'
+    ]
+    
+    # Economic/macro factors that impact commodities
+    economic_keywords = [
+        'inflation', 'deflation', 'interest rate', 'fed', 'federal reserve',
+        'dollar', 'currency', 'exchange rate', 'trade war', 'tariff',
+        'supply chain', 'manufacturing', 'industrial', 'production',
+        'mining', 'extraction', 'refining', 'smelting', 'infrastructure',
+        'construction', 'automotive', 'transportation', 'logistics'
+    ]
+    
+    # Combine all keywords
+    all_keywords = metals_keywords + commodities_keywords + ev_green_keywords + economic_keywords
+    
+    # Check question, description, and tags
+    text_to_check = f"{question} {description} {' '.join(tags)}"
+    
+    return any(keyword in text_to_check for keyword in all_keywords)
+
+
+def is_market_tradeable(market: Dict[str, Any]) -> bool:
+    """
+    Check if a market is tradeable (not closed, resolved, etc.).
+    
+    Args:
+        market: Market data dictionary
+        
+    Returns:
+        True if market is tradeable, False otherwise
+    """
+    # Check if market is closed
+    if market.get('isResolved', False):
+        return False
+    
+    # Check if market has a close time and is past it
+    close_time = market.get('closeTime')
+    if close_time and close_time < time.time() * 1000:  # Convert to milliseconds
+        return False
+    
+    # Check if market is cancelled
+    if market.get('resolution') == 'CANCEL':
+        return False
+    
+    return True
+
+
 @dataclass
 class MarketDecision:
     """Represents a trading decision for a market."""
@@ -118,13 +201,15 @@ class ManifoldBot:
         """
         return self.decision_maker.analyze_market(market)
     
-    def place_bet_if_decision(self, decision: MarketDecision, default_bet_amount: float = 10) -> bool:
+    def place_bet_if_decision(self, decision: MarketDecision, default_bet_amount: float = 10, 
+                             filter_metals_only: bool = True) -> bool:
         """
         Place a bet if the decision is to bet.
         
         Args:
             decision: MarketDecision object
             default_bet_amount: Default amount to bet if decision doesn't specify
+            filter_metals_only: If True, only trade on metals/commodities related markets
             
         Returns:
             True if bet was placed, False otherwise
@@ -135,6 +220,25 @@ class ManifoldBot:
         # Check if this is a binary market - only bet on binary markets
         if not hasattr(decision, 'outcome_type') or decision.outcome_type != 'BINARY':
             self.logger.info(f"Skipping non-binary market: {decision.question[:50]}... (type: {getattr(decision, 'outcome_type', 'unknown')})")
+            return False
+        
+        # Get the market data to check if it's tradeable
+        try:
+            market = self.reader.get_market(decision.market_id)
+        except Exception as e:
+            self.logger.warning(f"Could not fetch market data for {decision.market_id}: {e}")
+            return False
+        
+        # Check if market is tradeable (not closed, resolved, etc.)
+        if not is_market_tradeable(market):
+            self.logger.info(f"Skipping closed/resolved market: {decision.question[:50]}...")
+            return False
+        
+        # Check if market is related to metals/commodities (if filtering enabled)
+        # Always include MikhailTal's markets regardless of filter
+        creator = market.get('creatorUsername') or market.get('creator', '')
+        if filter_metals_only and not is_metals_commodities_market(market) and creator != 'MikhailTal':
+            self.logger.info(f"Skipping non-metals/commodities market: {decision.question[:50]}...")
             return False
         
         # Use decision's bet_amount if specified, otherwise use default
@@ -172,10 +276,11 @@ class ManifoldBot:
         self,
         usernames: List[str],
         bet_amount: int = 10,
-        max_bets_per_user: int = 2,
-        max_total_bets: int = 10,
+        max_bets_per_user: Optional[int] = 2,
+        max_total_bets: Optional[int] = 10,
         delay_between_bets: float = 2.0,
-        markets_per_user: int = 5
+        markets_per_user: Optional[int] = 5,
+        filter_metals_only: bool = True
     ) -> TradingSession:
         """
         Run the bot on markets from monitored users.
@@ -199,56 +304,57 @@ class ManifoldBot:
         
         self.logger.info(f"Starting monitoring of {len(usernames)} users...")
         
+        # Get all markets from all users in one efficient call
+        self.logger.info("🔍 Fetching all markets from monitored users...")
+        all_user_markets = self.reader.get_all_markets(usernames)
+        
+        # Process markets for each user
         for username in usernames:
-            if bets_placed >= max_total_bets:
+            if max_total_bets is not None and bets_placed >= max_total_bets:
                 self.logger.info(f"Reached maximum total bets ({max_total_bets}), stopping")
                 break
                 
-            self.logger.info(f"🔍 Checking markets from @{username}...")
+            self.logger.info(f"🔍 Processing markets from @{username}...")
             
-            try:
-                # Get recent markets from this user
-                user_markets = self.reader.get_user_markets(username, limit=markets_per_user)
+            user_markets = all_user_markets.get(username, [])
+            
+            # Apply limit if specified
+            if markets_per_user is not None and len(user_markets) > markets_per_user:
+                user_markets = user_markets[:markets_per_user]
+            
+            if not user_markets:
+                self.logger.info(f"  No markets found for @{username}")
+                continue
+            
+            user_bets_placed = 0
+            
+            for market in user_markets:
+                if (max_total_bets is not None and bets_placed >= max_total_bets) or \
+                   (max_bets_per_user is not None and user_bets_placed >= max_bets_per_user):
+                    break
                 
-                if not user_markets:
-                    self.logger.info(f"  No markets found for @{username}")
-                    continue
+                markets_analyzed += 1
                 
-                self.logger.info(f"  Found {len(user_markets)} markets from @{username}")
-                
-                user_bets_placed = 0
-                
-                for market in user_markets:
-                    if bets_placed >= max_total_bets or user_bets_placed >= max_bets_per_user:
-                        break
+                # Analyze the market
+                try:
+                    decision = self.analyze_market(market)
+                    decisions.append(decision)
                     
-                    markets_analyzed += 1
+                    if decision.decision != "SKIP":
+                        if self.place_bet_if_decision(decision, bet_amount, filter_metals_only):
+                            bets_placed += 1
+                            user_bets_placed += 1
+                            time.sleep(delay_between_bets)
                     
-                    # Analyze the market
-                    try:
-                        decision = self.analyze_market(market)
-                        decisions.append(decision)
-                        
-                        if decision.decision != "SKIP":
-                            if self.place_bet_if_decision(decision, bet_amount):
-                                bets_placed += 1
-                                user_bets_placed += 1
-                                time.sleep(delay_between_bets)
-                        
-                    except Exception as e:
-                        error_msg = f"Error analyzing market {market.get('id', 'unknown')}: {e}"
-                        self.logger.error(error_msg)
-                        errors.append(error_msg)
-                
-                if user_bets_placed > 0:
-                    self.logger.info(f"  ✅ Placed {user_bets_placed} bets on @{username}'s markets")
-                else:
-                    self.logger.info(f"  ⏭️  No bets placed on @{username}'s markets")
-                    
-            except Exception as e:
-                error_msg = f"Error getting markets for @{username}: {e}"
-                self.logger.error(error_msg)
-                errors.append(error_msg)
+                except Exception as e:
+                    error_msg = f"Error analyzing market {market.get('id', 'unknown')}: {e}"
+                    self.logger.error(error_msg)
+                    errors.append(error_msg)
+            
+            if user_bets_placed > 0:
+                self.logger.info(f"  ✅ Placed {user_bets_placed} bets on @{username}'s markets")
+            else:
+                self.logger.info(f"  ⏭️  No bets placed on @{username}'s markets")
         
         final_balance = self.writer.get_balance()
         
