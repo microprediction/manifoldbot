@@ -24,6 +24,7 @@ class MarketDecision:
     decision: str  # "YES", "NO", or "SKIP"
     confidence: float
     reasoning: str
+    outcome_type: str = "UNKNOWN"  # "BINARY", "MULTIPLE_CHOICE", "POLL", etc.
     bet_amount: Optional[float] = None  # Suggested bet amount
     metadata: Optional[Dict[str, Any]] = None
 
@@ -91,6 +92,14 @@ class ManifoldBot:
         
         self.logger = logging.getLogger(__name__)
         
+        # Configure logging to show INFO level messages
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter('%(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
+        
         # Verify authentication
         if not self.writer.is_authenticated():
             raise ValueError("Invalid Manifold API key")
@@ -123,6 +132,11 @@ class ManifoldBot:
         if decision.decision == "SKIP":
             return False
         
+        # Check if this is a binary market - only bet on binary markets
+        if not hasattr(decision, 'outcome_type') or decision.outcome_type != 'BINARY':
+            self.logger.info(f"Skipping non-binary market: {decision.question[:50]}... (type: {getattr(decision, 'outcome_type', 'unknown')})")
+            return False
+        
         # Use decision's bet_amount if specified, otherwise use default
         bet_amount = decision.bet_amount if decision.bet_amount is not None else default_bet_amount
         
@@ -133,16 +147,21 @@ class ManifoldBot:
             return False
         
         try:
+            # Debug: Log the bet parameters
+            self.logger.debug(f"Placing bet: market_id={decision.market_id}, outcome={decision.decision}, amount={int(bet_amount)}")
+            
             result = self.writer.place_bet(
                 market_id=decision.market_id,
                 outcome=decision.decision,
-                amount=bet_amount
+                amount=int(bet_amount)  # Convert to integer as required by API
             )
             
             self.logger.info(
                 f"Placed {decision.decision} bet of {bet_amount:.2f} M$ on: {decision.question[:50]}... "
                 f"(Current: {decision.current_probability:.1%}, Conf: {decision.confidence:.1%})"
             )
+            if decision.reasoning:
+                self.logger.info(f"  Rationale: {decision.reasoning}")
             return True
             
         except Exception as e:
@@ -174,6 +193,7 @@ class ManifoldBot:
         initial_balance = self.writer.get_balance()
         
         self.logger.info(f"Analyzing {len(markets)} markets...")
+        print(f"DEBUG: Starting analysis of {len(markets)} markets...")
         
         for i, market in enumerate(markets):
             if bets_placed >= max_bets:
@@ -181,20 +201,32 @@ class ManifoldBot:
                 break
             
             self.logger.info(f"Analyzing market {i+1}/{len(markets)}: {market.get('question', '')[:50]}...")
+            print(f"DEBUG: Analyzing market {i+1}/{len(markets)}: {market.get('question', '')[:50]}...")
             
             try:
                 # Analyze market
                 decision = self.analyze_market(market)
                 decisions.append(decision)
                 
-                # Log decision
-                prob_diff = abs(decision.confidence - decision.current_probability) if hasattr(decision, 'confidence') else 0
+                # Log decision with more details
                 self.logger.info(
                     f"Decision: {decision.decision} | "
+                    f"Type: {decision.outcome_type} | "
                     f"Current: {decision.current_probability:.1%} | "
-                    f"Confidence: {decision.confidence:.1%} | "
-                    f"Reasoning: {decision.reasoning[:50]}..."
+                    f"Confidence: {decision.confidence:.1%}"
                 )
+                self.logger.info(f"  Reasoning: {decision.reasoning}")
+                
+                # Also print to console for debugging
+                print(f"DECISION: {decision.decision} | Type: {decision.outcome_type} | Current: {decision.current_probability:.1%} | Confidence: {decision.confidence:.1%}")
+                print(f"  Reasoning: {decision.reasoning}")
+                
+                # Show LLM probability if available
+                if hasattr(decision, 'metadata') and decision.metadata and 'llm_probability' in decision.metadata:
+                    llm_prob = decision.metadata['llm_probability']
+                    prob_diff = decision.metadata.get('probability_difference', 0)
+                    self.logger.info(f"  LLM Probability: {llm_prob:.1%} | Difference: {prob_diff:.1%}")
+                    print(f"  LLM Probability: {llm_prob:.1%} | Difference: {prob_diff:.1%}")
                 
                 if decision.decision != "SKIP":
                     if self.place_bet_if_decision(decision, bet_amount):
@@ -382,7 +414,8 @@ class RandomDecisionMaker(DecisionMaker):
             current_probability=current_prob,
             decision=decision,
             confidence=confidence,
-            reasoning=reasoning
+            reasoning=reasoning,
+            outcome_type=market.get('outcomeType', 'UNKNOWN')
         )
 
 
@@ -538,8 +571,9 @@ class KellyCriterionDecisionMaker(DecisionMaker):
                 current_probability=current_prob,
                 decision=decision,
                 confidence=confidence,
-                reasoning=reasoning
-            )
+                            reasoning=reasoning,
+            outcome_type=market.get('outcomeType', 'UNKNOWN')
+        )
         
         # Calculate Kelly bet size with market impact limits
         kelly_bet = self.calculate_kelly_bet(true_prob, current_prob, bankroll, market_subsidy)
@@ -632,8 +666,9 @@ class ConfidenceBasedDecisionMaker(DecisionMaker):
                 current_probability=current_prob,
                 decision=decision,
                 confidence=confidence,
-                reasoning=reasoning
-            )
+                            reasoning=reasoning,
+            outcome_type=market.get('outcomeType', 'UNKNOWN')
+        )
         
         # Calculate bet size based on confidence and market impact limits
         bet_amount = self.calculate_bet_size(confidence, probability_diff, market_subsidy)
@@ -717,6 +752,7 @@ class LLMDecisionMaker(DecisionMaker):
                 decision=decision,
                 confidence=confidence,
                 reasoning=reasoning,
+                outcome_type=market.get('outcomeType', 'UNKNOWN'),
                 metadata={
                     "llm_probability": llm_prob,
                     "probability_difference": prob_diff,
@@ -731,5 +767,6 @@ class LLMDecisionMaker(DecisionMaker):
                 current_probability=current_prob,
                 decision="SKIP",
                 confidence=0.0,
-                reasoning=f"Error: {str(e)}"
+                reasoning=f"Error: {str(e)}",
+                outcome_type=market.get('outcomeType', 'UNKNOWN')
             )

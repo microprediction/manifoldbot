@@ -65,7 +65,7 @@ class ManifoldReader:
             try:
                 response = self.session.request(method=method, url=url, params=params, json=data, timeout=self.timeout)
 
-                # Check for retryable status codes
+                # Check for retryable status codes (don't retry 400 errors - they're client errors)
                 if response.status_code in self.retry_config["retry_on"]:
                     if attempt < self.retry_config["max_retries"]:
                         wait_time = self.retry_config["backoff_factor"] ** attempt
@@ -75,6 +75,14 @@ class ManifoldReader:
                     else:
                         # Max retries exceeded, raise exception
                         raise requests.RequestException("Max retries exceeded")
+                
+                # For 400 errors, log detailed error and raise immediately
+                if response.status_code == 400:
+                    logger.error(f"Bad Request (400) for {method} {url}")
+                    logger.error(f"  Request params: {params}")
+                    logger.error(f"  Request data: {data}")
+                    logger.error(f"  Response text: {response.text}")
+                    response.raise_for_status()
 
                 response.raise_for_status()
                 return response.json()

@@ -96,7 +96,17 @@ class ManifoldWriter(ManifoldReader):
             # Add default expiration for limit orders (6 hours)
             data["expiresMillisAfter"] = 6 * 60 * 60 * 1000
 
-        return self._make_authenticated_request("POST", "bet", data=data)
+        try:
+            return self._make_authenticated_request("POST", "bet", data=data)
+        except requests.RequestException as e:
+            # Log detailed error information
+            self.logger.error(f"Bet placement failed for market {market_id}:")
+            self.logger.error(f"  Request data: {data}")
+            self.logger.error(f"  Error: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                self.logger.error(f"  Response status: {e.response.status_code}")
+                self.logger.error(f"  Response text: {e.response.text}")
+            raise
 
     def place_limit_yes(self, market_id: str, amount: int, limit_prob: float) -> Dict[str, Any]:
         """

@@ -16,6 +16,7 @@ pip install manifoldbot
 export MANIFOLD_API_KEY="your_manifold_api_key"
 export OPENAI_API_KEY="your_openai_key"
 ```
+(or place these in .env)
 
 ### 3. Run the LLM Trading Bot
 
