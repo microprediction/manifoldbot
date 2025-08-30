@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 
 from manifoldbot.manifold.bot import (
     ManifoldBot, DecisionMaker, MarketDecision, TradingSession,
-    CallbackDecisionMaker, SimpleRuleDecisionMaker
+    CallbackDecisionMaker, RandomDecisionMaker
 )
 
 
@@ -279,12 +279,12 @@ class TestManifoldBot:
         mock_reader.get_user_markets.assert_called_once_with("user123", limit=5)
 
 
-class TestSimpleRuleDecisionMaker:
-    """Test cases for SimpleRuleDecisionMaker."""
+class TestRandomDecisionMaker:
+    """Test cases for RandomDecisionMaker."""
     
     def test_analyze_market_low_probability(self):
         """Test decision making for low probability markets."""
-        decision_maker = SimpleRuleDecisionMaker()
+        decision_maker = RandomDecisionMaker()
         
         market = {
             "id": "test123",
@@ -300,7 +300,7 @@ class TestSimpleRuleDecisionMaker:
     
     def test_analyze_market_high_probability(self):
         """Test decision making for high probability markets."""
-        decision_maker = SimpleRuleDecisionMaker()
+        decision_maker = RandomDecisionMaker()
         
         market = {
             "id": "test123",
@@ -316,7 +316,7 @@ class TestSimpleRuleDecisionMaker:
     
     def test_analyze_market_middle_probability(self):
         """Test decision making for middle probability markets."""
-        decision_maker = SimpleRuleDecisionMaker()
+        decision_maker = RandomDecisionMaker()
         
         market = {
             "id": "test123",

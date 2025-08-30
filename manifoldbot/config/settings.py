@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class DataSourceConfig(BaseModel):
@@ -21,7 +21,8 @@ class DataSourceConfig(BaseModel):
     selector: Optional[str] = Field(None, description="CSS selector for web scraping")
     poll_interval: int = Field(900, description="Polling interval in seconds")
 
-    @validator("type")
+    @field_validator("type")
+    @classmethod
     def validate_type(cls, v):
         allowed_types = ["web", "rss", "api"]
         if v not in allowed_types:
@@ -68,11 +69,13 @@ class BotConfig(BaseModel):
     openai_api_key: Optional[str] = Field(None, description="OpenAI API key")
     manifold_api_key: Optional[str] = Field(None, description="Manifold API key")
 
-    @validator("openai_api_key", pre=True, always=True)
+    @field_validator("openai_api_key", mode="before")
+    @classmethod
     def load_openai_key(cls, v):
         return v or os.getenv("OPENAI_API_KEY")
 
-    @validator("manifold_api_key", pre=True, always=True)
+    @field_validator("manifold_api_key", mode="before")
+    @classmethod
     def load_manifold_key(cls, v):
         return v or os.getenv("MANIFOLD_API_KEY")
 

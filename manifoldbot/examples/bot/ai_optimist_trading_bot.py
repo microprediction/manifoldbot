@@ -1,10 +1,8 @@
 """
-Simple trading bot example.
+AI Optimist Trading Bot Example
 
-This example demonstrates a basic trading strategy that looks for
-undervalued markets and places small bets.
-
-Requires MANIFOLD_API_KEY environment variable.
+This bot finds markets with keywords like "AI" that have low probabilities
+and bets YES on them.
 """
 
 import os
@@ -14,8 +12,8 @@ from typing import Any, Dict, List
 from manifoldbot.manifold import ManifoldReader, ManifoldWriter
 
 
-class SimpleTradingBot:
-    """A simple trading bot that looks for undervalued markets."""
+class AiOptimistTradingBot:
+    """A trading bot that bets YES on AI-related markets with low probabilities."""
 
     def __init__(self, api_key: str):
         """Initialize the trading bot."""
@@ -94,30 +92,21 @@ class SimpleTradingBot:
 
 
 def main():
-    """Run the simple trading bot."""
-    # Check for API key
+    """Run the AI optimist trading bot."""
+    # Get API key
     api_key = os.getenv("MANIFOLD_API_KEY")
     if not api_key:
-        print("❌ MANIFOLD_API_KEY environment variable not set")
+        print("Error: MANIFOLD_API_KEY environment variable not set")
         return
 
-    # Initialize bot
-    bot = SimpleTradingBot(api_key=api_key)
-
-    # Check authentication
-    if not bot.writer.is_authenticated():
-        print("❌ Authentication failed")
-        return
-
-    print("✅ Trading bot initialized successfully!")
-    print(f"💰 Current balance: {bot.writer.get_balance():.2f}Ṁ")
+    # Create bot
+    bot = AiOptimistTradingBot(api_key=api_key)
+    
+    print(f"Current balance: {bot.writer.get_balance():.2f} M$")
 
     # Run trading cycle for AI-related markets
-    print("\n🤖 Running trading cycle for AI-related markets...")
     keywords = ["AI", "artificial intelligence", "machine learning"]
     bot.run_trading_cycle(keywords)
-
-    print("\n🎉 Trading cycle complete!")
 
 
 if __name__ == "__main__":

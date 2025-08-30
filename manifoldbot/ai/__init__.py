@@ -1,4 +1,11 @@
-"""AI integration and analysis."""
+"""
+Simple AI module for ManifoldBot.
 
-# Will be populated as we implement AI components
-__all__ = []
+Just handles OpenAI API calls cleanly.
+"""
+
+from .openai_client import analyze_market_with_gpt
+
+__all__ = [
+    "analyze_market_with_gpt",
+]

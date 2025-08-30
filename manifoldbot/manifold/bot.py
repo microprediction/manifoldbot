@@ -343,8 +343,8 @@ class CallbackDecisionMaker(DecisionMaker):
         return self.callback(market)
 
 
-class SimpleRuleDecisionMaker(DecisionMaker):
-    """Simple rule-based decision maker for testing."""
+class RandomDecisionMaker(DecisionMaker):
+    """Random decision maker for testing."""
     
     def __init__(self, min_probability_diff: float = 0.05, min_confidence: float = 0.6):
         """
@@ -655,3 +655,84 @@ class ConfidenceBasedDecisionMaker(DecisionMaker):
                 "max_bet_by_impact": market_subsidy * 0.05 if market_subsidy > 0 else None
             }
         )
+
+
+class LLMDecisionMaker(DecisionMaker):
+    """Decision maker that uses an LLM to analyze markets."""
+    
+    def __init__(self, openai_api_key: str, min_confidence: float = 0.6, model: str = "gpt-4"):
+        """
+        Initialize LLM decision maker.
+        
+        Args:
+            openai_api_key: OpenAI API key
+            min_confidence: Minimum confidence threshold for placing bets
+            model: GPT model to use
+        """
+        self.openai_api_key = openai_api_key
+        self.min_confidence = min_confidence
+        self.model = model
+    
+    def analyze_market(self, market: Dict[str, Any]) -> MarketDecision:
+        """
+        Use LLM to analyze a market and make a trading decision.
+        
+        Args:
+            market: Market data from Manifold API
+            
+        Returns:
+            MarketDecision object
+        """
+        from ..ai import analyze_market_with_gpt
+        
+        question = market.get("question", "")
+        description = market.get("description", "")
+        current_prob = market.get("probability", 0.5)
+        market_id = market.get("id", "")
+        
+        try:
+            result = analyze_market_with_gpt(
+                question=question,
+                description=description,
+                current_probability=current_prob,
+                model=self.model,
+                api_key=self.openai_api_key
+            )
+            
+            llm_prob = result["llm_probability"]
+            confidence = result["confidence"]
+            reasoning = result["reasoning"]
+            
+            # Make trading decision
+            prob_diff = abs(llm_prob - current_prob)
+            decision = "SKIP"
+            
+            if prob_diff >= 0.05 and confidence >= self.min_confidence:  # 5% difference threshold
+                if llm_prob > current_prob:
+                    decision = "YES"
+                else:
+                    decision = "NO"
+            
+            return MarketDecision(
+                market_id=market_id,
+                question=question,
+                current_probability=current_prob,
+                decision=decision,
+                confidence=confidence,
+                reasoning=reasoning,
+                metadata={
+                    "llm_probability": llm_prob,
+                    "probability_difference": prob_diff,
+                    "model": self.model
+                }
+            )
+            
+        except Exception as e:
+            return MarketDecision(
+                market_id=market_id,
+                question=question,
+                current_probability=current_prob,
+                decision="SKIP",
+                confidence=0.0,
+                reasoning=f"Error: {str(e)}"
+            )

@@ -16,7 +16,7 @@ from .manifold.reader import ManifoldReader
 from .manifold.writer import ManifoldWriter
 from .manifold.bot import (
     ManifoldBot, DecisionMaker, MarketDecision, TradingSession,
-    SimpleRuleDecisionMaker, KellyCriterionDecisionMaker, ConfidenceBasedDecisionMaker
+    RandomDecisionMaker, KellyCriterionDecisionMaker, ConfidenceBasedDecisionMaker, LLMDecisionMaker
 )
 
 # Main exports
@@ -28,9 +28,10 @@ __all__ = [
     "DecisionMaker",
     "MarketDecision",
     "TradingSession",
-    "SimpleRuleDecisionMaker",
+    "RandomDecisionMaker",
     "KellyCriterionDecisionMaker",
     "ConfidenceBasedDecisionMaker",
+    "LLMDecisionMaker",
     "__version__",
     "__author__",
     "__email__",
