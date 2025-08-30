@@ -17,7 +17,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="manifoldbot",
-    version="0.1.1s",
+    version="0.1.1",
     author="ManifoldBot Contributors",
     author_email="",
     description="A comprehensive Python package for creating intelligent trading bots that interact with Manifold Markets",
