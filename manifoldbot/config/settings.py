@@ -39,6 +39,15 @@ class AIConfig(BaseModel):
     confidence_threshold: float = Field(0.75, description="Minimum confidence for actions")
 
 
+class UserConfig(BaseModel):
+    """Configuration for a specific user to monitor."""
+    
+    username: str = Field(..., description="Manifold username")
+    description: str = Field("", description="Description of user's market focus")
+    specialties: List[str] = Field(default_factory=list, description="List of market specialties")
+    example_market: Optional[str] = Field(None, description="Example market question")
+
+
 class ManifoldConfig(BaseModel):
     """Configuration for Manifold Markets integration."""
 
@@ -46,6 +55,7 @@ class ManifoldConfig(BaseModel):
     comment_only: bool = Field(True, description="Only post comments, don't trade")
     max_position_size: float = Field(5.0, description="Maximum position size in M$")
     default_probability: float = Field(0.55, description="Default probability for trades")
+    monitored_users: List[UserConfig] = Field(default_factory=list, description="List of users to monitor")
 
 
 class FilterConfig(BaseModel):
@@ -112,6 +122,41 @@ def load_config(config_path: str) -> BotConfig:
         raise ValueError(f"Invalid configuration: {e}")
 
 
+def get_default_monitored_users() -> List[UserConfig]:
+    """
+    Get the default list of users to monitor.
+    
+    Returns:
+        List of UserConfig objects for default monitored users
+    """
+    return [
+        UserConfig(
+            username="BoltonBailey",
+            description="Macro/industrial questions tied to lithium production rankings and other econ tech topics",
+            specialties=["lithium production", "macro economics", "industrial technology", "commodities"],
+            example_market="Will the US be a top 3 lithium producer in 2033?"
+        ),
+        UserConfig(
+            username="JoshDreckmeyr", 
+            description="Frequent, clearly resolved gold (XAU/USD) price markets using standard data sources",
+            specialties=["gold prices", "XAU/USD", "precious metals", "forex"],
+            example_market="GOLD closes above $3,330 this week?"
+        ),
+        UserConfig(
+            username="strutheo",
+            description="Longer-horizon gold markets framed for max price by date, good for scenario thinking", 
+            specialties=["gold price scenarios", "long-term forecasting", "precious metals"],
+            example_market="Highest value gold reaches by end of 2027?"
+        ),
+        UserConfig(
+            username="postjawline",
+            description="Materials/science angles that still touch copper (e.g., Meissner-effect claims in Cu-doped apatite) with explicit resolution conditions",
+            specialties=["materials science", "copper", "superconductivity", "scientific claims"],
+            example_market="Meissner-effect claims in Cu-doped apatite"
+        )
+    ]
+
+
 def create_example_config() -> str:
     """
     Create an example configuration file.
@@ -146,6 +191,23 @@ manifold:
   comment_only: true  # Start with comments only
   max_position_size: 5.0  # M$
   default_probability: 0.55
+  monitored_users:
+    - username: "BoltonBailey"
+      description: "Macro/industrial questions tied to lithium production rankings and other econ tech topics"
+      specialties: ["lithium production", "macro economics", "industrial technology", "commodities"]
+      example_market: "Will the US be a top 3 lithium producer in 2033?"
+    - username: "JoshDreckmeyr"
+      description: "Frequent, clearly resolved gold (XAU/USD) price markets using standard data sources"
+      specialties: ["gold prices", "XAU/USD", "precious metals", "forex"]
+      example_market: "GOLD closes above $3,330 this week?"
+    - username: "strutheo"
+      description: "Longer-horizon gold markets framed for max price by date, good for scenario thinking"
+      specialties: ["gold price scenarios", "long-term forecasting", "precious metals"]
+      example_market: "Highest value gold reaches by end of 2027?"
+    - username: "postjawline"
+      description: "Materials/science angles that still touch copper with explicit resolution conditions"
+      specialties: ["materials science", "copper", "superconductivity", "scientific claims"]
+      example_market: "Meissner-effect claims in Cu-doped apatite"
 
 filters:
   keywords:

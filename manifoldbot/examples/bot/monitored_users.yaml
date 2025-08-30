@@ -1,0 +1,10 @@
+# Configuration file for monitored users
+# The bot will cycle through these users and analyze their recent markets
+
+users:
+  - "BoltonBailey"    # macro/industrial questions tied to lithium production rankings
+  - "JoshDreckmeyr"   # frequent, clearly resolved gold (XAU/USD) price markets
+  - "strutheo"        # longer-horizon gold markets framed for max price by date
+  - "postjawline"     # materials/science angles that touch copper
+  - "MikhailTal"      # chess and other markets
+

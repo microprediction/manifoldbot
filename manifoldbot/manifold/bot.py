@@ -168,6 +168,104 @@ class ManifoldBot:
             self.logger.error(f"Failed to place bet on {decision.market_id}: {e}")
             return False
     
+    def run_on_monitored_users(
+        self,
+        usernames: List[str],
+        bet_amount: int = 10,
+        max_bets_per_user: int = 2,
+        max_total_bets: int = 10,
+        delay_between_bets: float = 2.0,
+        markets_per_user: int = 5
+    ) -> TradingSession:
+        """
+        Run the bot on markets from monitored users.
+        
+        Args:
+            usernames: List of usernames to monitor
+            bet_amount: Amount to bet per market
+            max_bets_per_user: Maximum bets per user
+            max_total_bets: Maximum total bets across all users
+            delay_between_bets: Delay between bets in seconds
+            markets_per_user: Number of recent markets to check per user
+            
+        Returns:
+            TradingSession with results
+        """
+        initial_balance = self.writer.get_balance()
+        decisions = []
+        errors = []
+        bets_placed = 0
+        markets_analyzed = 0
+        
+        self.logger.info(f"Starting monitoring of {len(usernames)} users...")
+        
+        for username in usernames:
+            if bets_placed >= max_total_bets:
+                self.logger.info(f"Reached maximum total bets ({max_total_bets}), stopping")
+                break
+                
+            self.logger.info(f"🔍 Checking markets from @{username}...")
+            
+            try:
+                # Get recent markets from this user
+                user_markets = self.reader.get_user_markets(username, limit=markets_per_user)
+                
+                if not user_markets:
+                    self.logger.info(f"  No markets found for @{username}")
+                    continue
+                
+                self.logger.info(f"  Found {len(user_markets)} markets from @{username}")
+                
+                user_bets_placed = 0
+                
+                for market in user_markets:
+                    if bets_placed >= max_total_bets or user_bets_placed >= max_bets_per_user:
+                        break
+                    
+                    markets_analyzed += 1
+                    
+                    # Analyze the market
+                    try:
+                        decision = self.analyze_market(market)
+                        decisions.append(decision)
+                        
+                        if decision.decision != "SKIP":
+                            if self.place_bet_if_decision(decision, bet_amount):
+                                bets_placed += 1
+                                user_bets_placed += 1
+                                time.sleep(delay_between_bets)
+                        
+                    except Exception as e:
+                        error_msg = f"Error analyzing market {market.get('id', 'unknown')}: {e}"
+                        self.logger.error(error_msg)
+                        errors.append(error_msg)
+                
+                if user_bets_placed > 0:
+                    self.logger.info(f"  ✅ Placed {user_bets_placed} bets on @{username}'s markets")
+                else:
+                    self.logger.info(f"  ⏭️  No bets placed on @{username}'s markets")
+                    
+            except Exception as e:
+                error_msg = f"Error getting markets for @{username}: {e}"
+                self.logger.error(error_msg)
+                errors.append(error_msg)
+        
+        final_balance = self.writer.get_balance()
+        
+        self.logger.info(f"🏁 Monitoring complete: {bets_placed} bets placed, {markets_analyzed} markets analyzed")
+        self.logger.info(f"💰 Balance: {initial_balance:.2f} → {final_balance:.2f} M$")
+        
+        return TradingSession(
+            markets_analyzed=markets_analyzed,
+            bets_placed=bets_placed,
+            initial_balance=initial_balance,
+            final_balance=final_balance,
+            decisions=decisions,
+            errors=errors
+        )
+
+
+
     def run_on_markets(
         self,
         markets: List[Dict[str, Any]],
