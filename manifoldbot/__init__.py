@@ -12,14 +12,25 @@ __email__ = "peter@example.com"
 from .config.settings import load_config
 
 # Core imports - these will be available when someone does `import manifoldbot`
-from .core.bot import Bot
 from .manifold.reader import ManifoldReader
+from .manifold.writer import ManifoldWriter
+from .manifold.bot import (
+    ManifoldBot, DecisionMaker, MarketDecision, TradingSession,
+    SimpleRuleDecisionMaker, KellyCriterionDecisionMaker, ConfidenceBasedDecisionMaker
+)
 
 # Main exports
 __all__ = [
-    "Bot",
     "load_config",
     "ManifoldReader",
+    "ManifoldWriter",
+    "ManifoldBot",
+    "DecisionMaker",
+    "MarketDecision",
+    "TradingSession",
+    "SimpleRuleDecisionMaker",
+    "KellyCriterionDecisionMaker",
+    "ConfidenceBasedDecisionMaker",
     "__version__",
     "__author__",
     "__email__",

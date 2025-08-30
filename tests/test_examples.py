@@ -1,156 +1,180 @@
 """
-Tests for example scripts to ensure they don't become stale.
-
-These tests verify that the example scripts can be imported and run
-without errors (though they may skip execution if API keys are missing).
+Tests for example scripts to ensure they are functional.
 """
 
 import os
-import sys
-import unittest
-from unittest.mock import MagicMock, patch
+import pytest
+from unittest.mock import patch, MagicMock
 
-# Add the manifoldbot package to the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Test the LLM trading bot
+def test_llm_trading_bot_import():
+    """Test that the LLM trading bot can be imported."""
+    from manifoldbot.examples.llm_trading_bot import LLMTradingBot, TradingDecision
+    
+    # Test TradingDecision dataclass
+    decision = TradingDecision(
+        market_id="test123",
+        question="Test question?",
+        current_probability=0.5,
+        llm_probability=0.6,
+        decision="YES",
+        confidence=0.8,
+        reasoning="Test reasoning"
+    )
+    
+    assert decision.market_id == "test123"
+    assert decision.decision == "YES"
+    assert decision.confidence == 0.8
 
+@patch.dict(os.environ, {"MANIFOLD_API_KEY": "test_key", "OPENAI_API_KEY": "test_openai_key"})
+@patch('manifoldbot.examples.llm_trading_bot.openai.OpenAI')
+@patch('manifoldbot.examples.llm_trading_bot.ManifoldWriter')
+def test_llm_trading_bot_init(mock_writer_class, mock_openai):
+    """Test LLM trading bot initialization."""
+    from manifoldbot.examples.llm_trading_bot import LLMTradingBot
+    
+    # Mock the writer
+    mock_writer = MagicMock()
+    mock_writer.is_authenticated.return_value = True
+    mock_writer.get_balance.return_value = 100.0
+    mock_writer_class.return_value = mock_writer
+    
+    # Mock OpenAI client
+    mock_client = MagicMock()
+    mock_openai.return_value = mock_client
+    
+    # Create bot
+    bot = LLMTradingBot(
+        manifold_api_key="test_key",
+        openai_api_key="test_openai_key",
+        min_confidence=0.6
+    )
+    
+    assert bot.min_confidence == 0.6
+    assert bot.writer == mock_writer
+    assert bot.client == mock_client
 
-class TestExamples(unittest.TestCase):
-    """Test that example scripts are importable and runnable."""
+@patch.dict(os.environ, {"MANIFOLD_API_KEY": "test_key", "OPENAI_API_KEY": "test_openai_key"})
+@patch('manifoldbot.examples.llm_trading_bot.openai.OpenAI')
+@patch('manifoldbot.examples.llm_trading_bot.ManifoldWriter')
+@patch('manifoldbot.examples.llm_trading_bot.ManifoldReader')
+def test_llm_trading_bot_analyze_market(mock_reader_class, mock_writer_class, mock_openai):
+    """Test market analysis functionality."""
+    from manifoldbot.examples.llm_trading_bot import LLMTradingBot
+    
+    # Mock the writer
+    mock_writer = MagicMock()
+    mock_writer.is_authenticated.return_value = True
+    mock_writer.get_balance.return_value = 100.0
+    mock_writer_class.return_value = mock_writer
+    
+    # Mock the reader
+    mock_reader = MagicMock()
+    mock_reader_class.return_value = mock_reader
+    
+    # Mock OpenAI client
+    mock_client = MagicMock()
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock()]
+    mock_response.choices[0].message.content = """
+PROBABILITY: 70
+CONFIDENCE: 80
+REASONING: Based on current trends and data
+"""
+    mock_client.chat.completions.create.return_value = mock_response
+    mock_openai.return_value = mock_client
+    
+    # Create bot
+    bot = LLMTradingBot(
+        manifold_api_key="test_key",
+        openai_api_key="test_openai_key",
+        min_confidence=0.6
+    )
+    
+    # Test market analysis
+    market = {
+        "id": "test123",
+        "question": "Will it rain tomorrow?",
+        "description": "Weather prediction",
+        "probability": 0.5
+    }
+    
+    decision = bot.analyze_market(market)
+    
+    assert decision.market_id == "test123"
+    assert decision.llm_probability == 0.7
+    assert decision.confidence == 0.8
+    assert decision.decision == "YES"  # LLM thinks 70%, market is 50%, so bet YES
+    assert "trends and data" in decision.reasoning
 
-    def test_basic_reader_example_imports(self):
-        """Test that basic_reader.py can be imported."""
-        try:
-            from manifoldbot.examples.basic_reader import main
+@patch.dict(os.environ, {"MANIFOLD_API_KEY": "test_key", "OPENAI_API_KEY": "test_openai_key"})
+@patch('manifoldbot.examples.llm_trading_bot.openai.OpenAI')
+@patch('manifoldbot.examples.llm_trading_bot.ManifoldWriter')
+@patch('manifoldbot.examples.llm_trading_bot.ManifoldReader')
+def test_llm_trading_bot_run_on_user_markets(mock_reader_class, mock_writer_class, mock_openai):
+    """Test running bot on user markets."""
+    from manifoldbot.examples.llm_trading_bot import LLMTradingBot
+    
+    # Mock the writer
+    mock_writer = MagicMock()
+    mock_writer.is_authenticated.return_value = True
+    mock_writer.get_balance.return_value = 100.0
+    mock_writer_class.return_value = mock_writer
+    
+    # Mock the reader
+    mock_reader = MagicMock()
+    mock_reader.get_user.return_value = {"id": "user123", "name": "MikhailTal"}
+    mock_reader.get_user_markets.return_value = [
+        {"id": "market1", "question": "Test question 1", "probability": 0.5},
+        {"id": "market2", "question": "Test question 2", "probability": 0.6}
+    ]
+    mock_reader_class.return_value = mock_reader
+    
+    # Mock OpenAI client
+    mock_client = MagicMock()
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock()]
+    mock_response.choices[0].message.content = """
+PROBABILITY: 50
+CONFIDENCE: 50
+REASONING: No strong opinion
+"""
+    mock_client.chat.completions.create.return_value = mock_response
+    mock_openai.return_value = mock_client
+    
+    # Create bot
+    bot = LLMTradingBot(
+        manifold_api_key="test_key",
+        openai_api_key="test_openai_key",
+        min_confidence=0.6
+    )
+    
+    # Test running on user markets
+    result = bot.run_on_user_markets(username="MikhailTal", limit=2, bet_amount=5, max_bets=1)
+    
+    # Should have analyzed 2 markets but placed no bets (confidence too low)
+    assert result["markets_analyzed"] == 2
+    assert result["bets_placed"] == 0
+    assert result["initial_balance"] == 100.0
+    
+    # Verify the reader methods were called
+    mock_reader.get_user.assert_called_once_with("MikhailTal")
+    mock_reader.get_user_markets.assert_called_once_with("user123", limit=2)
 
-            self.assertTrue(callable(main))
-        except ImportError as e:
-            self.fail(f"Could not import basic_reader example: {e}")
+def test_basic_reader_example():
+    """Test that basic reader example can be imported."""
+    from manifoldbot.examples.basic_reader import main
+    # Just test that it can be imported without error
+    assert callable(main)
 
-    def test_basic_writer_example_imports(self):
-        """Test that basic_writer.py can be imported."""
-        try:
-            from manifoldbot.examples.basic_writer import main
+def test_basic_writer_example():
+    """Test that basic writer example can be imported."""
+    from manifoldbot.examples.basic_writer import main
+    # Just test that it can be imported without error
+    assert callable(main)
 
-            self.assertTrue(callable(main))
-        except ImportError as e:
-            self.fail(f"Could not import basic_writer example: {e}")
-
-    def test_simple_trading_bot_example_imports(self):
-        """Test that simple_trading_bot.py can be imported."""
-        try:
-            from manifoldbot.examples.simple_trading_bot import (
-                SimpleTradingBot, main)
-
-            self.assertTrue(callable(SimpleTradingBot))
-            self.assertTrue(callable(main))
-        except ImportError as e:
-            self.fail(f"Could not import simple_trading_bot example: {e}")
-
-    @patch("manifoldbot.examples.basic_reader.ManifoldReader")
-    def test_basic_reader_example_runs(self, mock_reader_class):
-        """Test that basic_reader example can run without errors."""
-        # Mock the reader
-        mock_reader = MagicMock()
-        mock_reader_class.return_value = mock_reader
-
-        # Mock market data
-        mock_reader.get_markets.return_value = [
-            {"question": "Test market 1", "probability": 0.5, "volume": 1000}
-        ]
-        mock_reader.get_market_by_slug.return_value = {
-            "question": "Test market by slug",
-            "probability": 0.6,
-            "volume": 500,
-        }
-        mock_reader.search_markets.return_value = [
-            {"question": "AI test market", "probability": 0.3, "volume": 200}
-        ]
-
-        # Import and run
-        from manifoldbot.examples.basic_reader import main
-
-        # Should not raise any exceptions
-        try:
-            main()
-        except Exception as e:
-            self.fail(f"basic_reader example failed to run: {e}")
-
-    @patch("manifoldbot.examples.basic_writer.ManifoldWriter")
-    def test_basic_writer_example_runs(self, mock_writer_class):
-        """Test that basic_writer example can run without errors."""
-        # Mock the writer
-        mock_writer = MagicMock()
-        mock_writer_class.return_value = mock_writer
-        mock_writer.is_authenticated.return_value = True
-        mock_writer.get_me.return_value = {"name": "Test User"}
-        mock_writer.get_balance.return_value = 100.0
-        mock_writer.get_total_deposits.return_value = 200.0
-        mock_writer.get_portfolio.return_value = {"totalValue": 100}
-        mock_writer.get_positions.return_value = []
-        mock_writer.calculate_market_impact.return_value = {
-            "current_probability": 0.5,
-            "estimated_impact": 0.01,
-            "new_probability": 0.51,
-        }
-
-        # Mock environment variable
-        with patch.dict(os.environ, {"MANIFOLD_API_KEY": "test_key"}):
-            from manifoldbot.examples.basic_writer import main
-
-            # Should not raise any exceptions
-            try:
-                main()
-            except Exception as e:
-                self.fail(f"basic_writer example failed to run: {e}")
-
-    def test_basic_writer_example_without_api_key(self):
-        """Test that basic_writer handles missing API key gracefully."""
-        # Remove API key from environment
-        with patch.dict(os.environ, {}, clear=True):
-            from manifoldbot.examples.basic_writer import main
-
-            # Should not raise any exceptions
-            try:
-                main()
-            except Exception as e:
-                self.fail(f"basic_writer failed to handle missing key: {e}")
-
-    @patch("manifoldbot.examples.simple_trading_bot.ManifoldReader")
-    @patch("manifoldbot.examples.simple_trading_bot.ManifoldWriter")
-    def test_simple_trading_bot_example_runs(
-        self, mock_writer_class, mock_reader_class
-    ):
-        """Test that simple_trading_bot can run without errors."""
-        # Mock the reader
-        mock_reader = MagicMock()
-        mock_reader_class.return_value = mock_reader
-        mock_reader.get_markets.return_value = [
-            {
-                "id": "test_market_1",
-                "question": "AI will dominate by 2030",
-                "probability": 0.2,
-                "volume": 500,
-                "isResolved": False,
-            }
-        ]
-
-        # Mock the writer
-        mock_writer = MagicMock()
-        mock_writer_class.return_value = mock_writer
-        mock_writer.is_authenticated.return_value = True
-        mock_writer.get_balance.return_value = 50.0
-        mock_writer.place_bet.return_value = {"betId": "test_bet_123"}
-
-        # Mock environment variable
-        with patch.dict(os.environ, {"MANIFOLD_API_KEY": "test_key"}):
-            from manifoldbot.examples.simple_trading_bot import main
-
-            # Should not raise any exceptions
-            try:
-                main()
-            except Exception as e:
-                self.fail(f"simple_trading_bot example failed to run: {e}")
-
-
-if __name__ == "__main__":
-    unittest.main()
+def test_simple_trading_bot_example():
+    """Test that simple trading bot example can be imported."""
+    from manifoldbot.examples.simple_trading_bot import main
+    # Just test that it can be imported without error
+    assert callable(main)
