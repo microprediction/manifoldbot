@@ -193,6 +193,87 @@ class ManifoldReader:
         params = filters or {}
         return self._paginate("markets", params=params, limit=limit)
 
+    def get_all_markets(self, username: Optional[str] = None) -> List[Dict[str, Any]]:
+        """
+        Get ALL markets by a specific user (defaults to MikhailTal).
+        
+        Since the API doesn't support filtering by creator, this method fetches
+        all markets and filters them client-side by creator name.
+        
+        Args:
+            username: Username to filter by. Defaults to "MikhailTal" if not provided
+            
+        Returns:
+            List of ALL markets created by the specified user
+        """
+        if username is None:
+            username = "MikhailTal"
+        
+        print(f"Fetching ALL markets and filtering by creator: {username}...")
+        
+        # Get all markets using proper pagination with 'before' parameter
+        all_markets = []
+        page = 1
+        limit = 1000
+        before_cursor = None
+        
+        while True:
+            print(f"  Page {page}: ", end="", flush=True)
+            
+            # Build params for this page
+            params = {"limit": limit}
+            if before_cursor:
+                params["before"] = before_cursor
+            
+            # Get markets for this page
+            response = self._make_request("GET", "markets", params=params)
+            
+            if isinstance(response, list):
+                markets = response
+            elif isinstance(response, dict) and "data" in response:
+                markets = response["data"]
+            else:
+                markets = []
+            
+            if not markets:
+                print("No more markets")
+                break
+                
+            all_markets.extend(markets)
+            print(f"Got {len(markets)} markets (Total: {len(all_markets)})")
+            
+            # If we got fewer than the limit, we've reached the end
+            if len(markets) < limit:
+                print("  Reached end of markets")
+                break
+                
+            # Use the last market's ID as the cursor for next request
+            before_cursor = markets[-1]["id"]
+            page += 1
+            
+            # Safety check to avoid infinite loops
+            if page > 100:  # Max 100 pages = 100k markets
+                print("  Stopping at 100 pages for safety")
+                break
+        
+        # Filter by creator name - be more precise
+        user_markets = [
+            m for m in all_markets 
+            if m.get('creatorUsername') == username
+        ]
+        
+        # If no matches by username, try by creator name
+        if not user_markets:
+            user_markets = [
+                m for m in all_markets 
+                if m.get('creatorName') == username
+            ]
+        
+        print(f"✅ Found {len(user_markets)} markets by {username} out of {len(all_markets)} total markets")
+        return user_markets
+
+
+
     def get_trending_markets(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """
         Get trending markets.

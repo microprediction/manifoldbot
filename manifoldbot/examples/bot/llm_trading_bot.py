@@ -37,9 +37,10 @@ def main(trade_all=False):
     )
     
     if trade_all:
-        # Trade all markets
+        # Trade ALL markets
         reader = ManifoldReader()
-        markets = reader.get_markets()
+        print("Fetching ALL markets (this will take a moment)...")
+        markets = reader.get_all_markets()
         print(f"Found {len(markets)} total markets")
         session = bot.run_on_markets(
             markets=markets,
