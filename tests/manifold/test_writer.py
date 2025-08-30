@@ -54,7 +54,7 @@ class TestManifoldWriter:
 
         assert result == mock_response
         mock_request.assert_called_once_with(
-            "POST", "bet", json={"contractId": "market123", "outcome": "YES", "amount": 10, "orderType": "market"}
+            "POST", "bet", data={"contractId": "market123", "outcome": "YES", "amount": 10}
         )
 
     @patch.object(ManifoldWriter, "_make_authenticated_request")
@@ -69,7 +69,7 @@ class TestManifoldWriter:
         mock_request.assert_called_once_with(
             "POST",
             "bet",
-            json={"contractId": "market123", "outcome": "NO", "amount": 5, "orderType": "market", "limitProb": 0.6},
+            data={"contractId": "market123", "outcome": "NO", "amount": 5, "limitProb": 0.6, "expiresMillisAfter": 21600000},
         )
 
     def test_place_bet_validation(self):
@@ -131,7 +131,7 @@ class TestManifoldWriter:
         mock_request.assert_called_once_with(
             "POST",
             "market",
-            json={"question": "Will this test pass?", "description": "A test market", "outcomeType": "BINARY"},
+            data={"question": "Will this test pass?", "description": "A test market", "outcomeType": "BINARY"},
         )
 
     @patch.object(ManifoldWriter, "_make_authenticated_request")
@@ -152,7 +152,7 @@ class TestManifoldWriter:
         mock_request.assert_called_once_with(
             "POST",
             "market",
-            json={
+            data={
                 "question": "Test question",
                 "description": "Test description",
                 "outcomeType": "MULTIPLE_CHOICE",
@@ -187,7 +187,7 @@ class TestManifoldWriter:
         result = self.writer.close_market("market123", "YES")
 
         assert result == mock_response
-        mock_request.assert_called_once_with("POST", "market/market123/close", json={"outcome": "YES"})
+        mock_request.assert_called_once_with("POST", "market/market123/close", data={"outcome": "YES"})
 
     @patch.object(ManifoldWriter, "_make_authenticated_request")
     def test_close_market_with_probability(self, mock_request):
@@ -197,7 +197,7 @@ class TestManifoldWriter:
 
         result = self.writer.close_market("market123", "MULTI", probability=0.7)
 
-        mock_request.assert_called_once_with("POST", "market/market123/close", json={"outcome": "MULTI", "probability": 0.7})
+        mock_request.assert_called_once_with("POST", "market/market123/close", data={"outcome": "MULTI", "probability": 0.7})
 
     @patch.object(ManifoldWriter, "_make_authenticated_request")
     def test_get_positions(self, mock_request):
@@ -244,7 +244,7 @@ class TestManifoldWriter:
         result = self.writer.post_comment("market123", "Great market!")
 
         assert result == mock_comment
-        mock_request.assert_called_once_with("POST", "comment", json={"contractId": "market123", "text": "Great market!"})
+        mock_request.assert_called_once_with("POST", "comment", data={"contractId": "market123", "text": "Great market!"})
 
     @patch.object(ManifoldWriter, "_make_authenticated_request")
     def test_post_comment_reply(self, mock_request):
@@ -255,7 +255,7 @@ class TestManifoldWriter:
         result = self.writer.post_comment("market123", "I agree", reply_to="comment123")
 
         mock_request.assert_called_once_with(
-            "POST", "comment", json={"contractId": "market123", "text": "I agree", "replyToCommentId": "comment123"}
+            "POST", "comment", data={"contractId": "market123", "text": "I agree", "replyToCommentId": "comment123"}
         )
 
     def test_post_comment_validation(self):
@@ -286,7 +286,7 @@ class TestManifoldWriter:
         result = self.writer.update_user(name="UpdatedName", bio="New bio")
 
         assert result == mock_user
-        mock_request.assert_called_once_with("POST", "me", json={"name": "UpdatedName", "bio": "New bio"})
+        mock_request.assert_called_once_with("POST", "me", data={"name": "UpdatedName", "bio": "New bio"})
 
     @patch.object(ManifoldWriter, "get_market")
     def test_calculate_market_impact(self, mock_get_market):

@@ -85,7 +85,38 @@ manifoldbot start --config my_bot.yaml
 
 ## Documentation
 
-For detailed documentation, examples, and architecture information, see [PLAN.md](PLAN.md).
+### 📚 Complete Documentation
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Get up and running in 5 minutes
+- **[Full Documentation](docs/README.md)** - Comprehensive guide with examples
+- **[API Reference](docs/API_REFERENCE.md)** - Complete API documentation
+- **[Tutorial](docs/TUTORIAL.md)** - Step-by-step tutorial for building trading bots
+
+### 🏗️ Architecture & Planning
+- **[PLAN.md](PLAN.md)** - Project architecture and development plan
+- **[FUNCTIONALITY.md](FUNCTIONALITY.md)** - Feature specifications
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
+
+### 🚀 Quick Examples
+
+**Read Market Data (No API Key Required):**
+```python
+from manifoldbot.manifold import ManifoldReader
+
+reader = ManifoldReader()
+markets = reader.get_markets(limit=10)
+for market in markets:
+    print(f"{market['question']} - {market.get('probability', 0):.1%}")
+```
+
+**Place Bets (API Key Required):**
+```python
+import os
+from manifoldbot.manifold import ManifoldWriter
+
+writer = ManifoldWriter(api_key=os.getenv("MANIFOLD_API_KEY"))
+result = writer.place_bet("market_id", "YES", 10)  # 10Ṁ bet
+print(f"Bet placed: {result['betId']}")
+```
 
 ## Development
 

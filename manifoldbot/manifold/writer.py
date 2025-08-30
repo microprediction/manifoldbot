@@ -66,7 +66,7 @@ class ManifoldWriter(ManifoldReader):
     # Betting operations
 
     def place_bet(
-        self, market_id: str, outcome: str, amount: float, probability: Optional[float] = None, order_type: str = "market"
+        self, market_id: str, outcome: str, amount: int, probability: Optional[float] = None
     ) -> Dict[str, Any]:
         """
         Place a bet on a market.
@@ -74,9 +74,8 @@ class ManifoldWriter(ManifoldReader):
         Args:
             market_id: Market ID or slug
             outcome: "YES" or "NO"
-            amount: Amount to bet in M$
-            probability: Optional limit price (0-1)
-            order_type: "market" or "limit"
+            amount: Amount to bet in M$ (integer)
+            probability: Optional limit price (0-1) for limit orders
 
         Returns:
             Bet placement result
@@ -90,12 +89,42 @@ class ManifoldWriter(ManifoldReader):
         if probability is not None and not (0 <= probability <= 1):
             raise ValueError("Probability must be between 0 and 1")
 
-        data = {"contractId": market_id, "outcome": outcome, "amount": amount, "orderType": order_type}
+        data = {"contractId": market_id, "outcome": outcome, "amount": amount}
 
         if probability is not None:
             data["limitProb"] = probability
+            # Add default expiration for limit orders (6 hours)
+            data["expiresMillisAfter"] = 6 * 60 * 60 * 1000
 
-        return self._make_authenticated_request("POST", "bet", json=data)
+        return self._make_authenticated_request("POST", "bet", data=data)
+
+    def place_limit_yes(self, market_id: str, amount: int, limit_prob: float) -> Dict[str, Any]:
+        """
+        Place a YES limit order (convenience method).
+        
+        Args:
+            market_id: The market contract ID
+            amount: Order amount in M$
+            limit_prob: Limit probability (0.0-1.0)
+            
+        Returns:
+            Order response from API
+        """
+        return self.place_bet(market_id, "YES", amount, probability=limit_prob)
+
+    def place_limit_no(self, market_id: str, amount: int, limit_prob: float) -> Dict[str, Any]:
+        """
+        Place a NO limit order (convenience method).
+        
+        Args:
+            market_id: The market contract ID
+            amount: Order amount in M$
+            limit_prob: Limit probability (0.0-1.0)
+            
+        Returns:
+            Order response from API
+        """
+        return self.place_bet(market_id, "NO", amount, probability=limit_prob)
 
     def cancel_bet(self, bet_id: str) -> Dict[str, Any]:
         """
@@ -163,7 +192,7 @@ class ManifoldWriter(ManifoldReader):
         if group_id:
             data["groupId"] = group_id
 
-        return self._make_authenticated_request("POST", "market", json=data)
+        return self._make_authenticated_request("POST", "market", data=data)
 
     def close_market(self, market_id: str, outcome: str, probability: Optional[float] = None) -> Dict[str, Any]:
         """
@@ -182,7 +211,7 @@ class ManifoldWriter(ManifoldReader):
         if probability is not None:
             data["probability"] = probability
 
-        return self._make_authenticated_request("POST", f"market/{market_id}/close", json=data)
+        return self._make_authenticated_request("POST", f"market/{market_id}/close", data=data)
 
     # Position management
 
@@ -233,7 +262,7 @@ class ManifoldWriter(ManifoldReader):
         if reply_to:
             data["replyToCommentId"] = reply_to
 
-        return self._make_authenticated_request("POST", "comment", json=data)
+        return self._make_authenticated_request("POST", "comment", data=data)
 
     # User operations
 
@@ -256,7 +285,7 @@ class ManifoldWriter(ManifoldReader):
         Returns:
             Updated user data
         """
-        return self._make_authenticated_request("POST", "me", json=kwargs)
+        return self._make_authenticated_request("POST", "me", data=kwargs)
 
     # Advanced trading operations
 
