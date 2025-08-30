@@ -1,49 +1,56 @@
 # ManifoldBot
 
-A Python package for interacting with Manifold Markets API.
+A Python package for creating intelligent trading bots for Manifold Markets.
 
-## Installation
+## Quick Start
+
+### 1. Installation
 
 ```bash
 pip install manifoldbot
 ```
 
-## Quick Start
+### 2. Set API Keys
 
-### Read Market Data (No API Key Required)
-
-```python
-from manifoldbot.manifold import ManifoldReader
-
-reader = ManifoldReader()
-markets = reader.get_markets(limit=10)
-for market in markets:
-    print(f"{market['question']} - {market.get('probability', 0):.1%}")
+```bash
+export MANIFOLD_API_KEY="your_manifold_api_key"
+export OPENAI_API_KEY="your_openai_key"
 ```
 
-### Place Bets (API Key Required)
+### 3. Run the LLM Trading Bot
 
-```python
-import os
-from manifoldbot.manifold import ManifoldWriter
+Trade all markets with AI:
 
-writer = ManifoldWriter(api_key=os.getenv("MANIFOLD_API_KEY"))
-result = writer.place_bet("market_id", "YES", 10)  # 10Ṁ bet
-print(f"Bet placed: {result['betId']}")
+```bash
+python -m manifoldbot.examples.bot.llm_trading_bot --all
 ```
 
-## Examples
+Or trade recent markets only:
 
-See `manifoldbot/examples/` for complete working examples:
-- `basic_reader.py` - Market data fetching
-- `basic_writer.py` - Account management and trading  
-- `simple_trading_bot.py` - Complete trading bot
+```bash
+python -m manifoldbot.examples.bot.llm_trading_bot
+```
+
+## What It Does
+
+The LLM trading bot:
+- Analyzes market questions using GPT
+- Compares AI probability vs current market probability  
+- Places bets when there's a significant difference (≥5%)
+- Only bets when confidence is high (≥60%)
+
+## More Examples
+
+See `manifoldbot/examples/` for additional examples:
+- `manifold/basic_reader.py` - Read market data (no API key needed)
+- `manifold/basic_writer.py` - Place bets manually
+- `bot/ai_optimist_trading_bot.py` - Simple rule-based bot
 
 ## Documentation
 
 - [Full Documentation](docs/README.md)
+- [Tutorial](docs/TUTORIAL.md)
 - [API Reference](docs/API_REFERENCE.md)
-- [Quick Start Guide](docs/QUICKSTART.md)
 
 ## License
 

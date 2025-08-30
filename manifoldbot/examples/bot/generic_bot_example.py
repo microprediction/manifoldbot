@@ -6,7 +6,7 @@ decision makers for a more modular approach.
 """
 
 import os
-from manifoldbot import ManifoldBot, SimpleRuleDecisionMaker
+from manifoldbot import ManifoldBot, RandomDecisionMaker
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
         return
     
     # Create a decision maker
-    decision_maker = SimpleRuleDecisionMaker(fixed_bet=5)
+    decision_maker = RandomDecisionMaker()
     
     # Create bot with the decision maker
     bot = ManifoldBot(

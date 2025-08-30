@@ -142,15 +142,17 @@ Authenticated access for trading and market management (API key required).
 
 Working examples are available in the `manifoldbot/examples/` directory:
 
-- **[basic_reader.py](manifoldbot/examples/basic_reader.py)** - Basic market data fetching
-- **[basic_writer.py](manifoldbot/examples/basic_writer.py)** - Authenticated operations and account management  
-- **[simple_trading_bot.py](manifoldbot/examples/simple_trading_bot.py)** - Complete trading bot implementation
+- **[manifold/basic_reader.py](manifoldbot/examples/manifold/basic_reader.py)** - Basic market data fetching
+- **[manifold/basic_writer.py](manifoldbot/examples/manifold/basic_writer.py)** - Authenticated operations and account management  
+- **[bot/llm_trading_bot.py](manifoldbot/examples/bot/llm_trading_bot.py)** - LLM-powered trading bot
+- **[bot/ai_optimist_trading_bot.py](manifoldbot/examples/bot/ai_optimist_trading_bot.py)** - Simple rule-based trading bot
 
 Run examples directly:
 ```bash
-python -m manifoldbot.examples.basic_reader
-python -m manifoldbot.examples.basic_writer
-python -m manifoldbot.examples.simple_trading_bot
+python -m manifoldbot.examples.manifold.basic_reader
+python -m manifoldbot.examples.manifold.basic_writer
+python -m manifoldbot.examples.bot.llm_trading_bot
+python -m manifoldbot.examples.bot.llm_trading_bot --all
 ```
 
 **Note:** Examples are tested to ensure they stay up-to-date with the API.
