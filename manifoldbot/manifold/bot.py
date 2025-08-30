@@ -25,9 +25,9 @@ def is_metals_commodities_market(market: Dict[str, Any]) -> bool:
     Returns:
         True if market is related to metals/commodities, False otherwise
     """
-    question = market.get('question', '').lower()
-    description = market.get('description', '').lower()
-    tags = [tag.lower() for tag in market.get('tags', [])]
+    question = str(market.get('question', '')).lower()
+    description = str(market.get('description', '')).lower()
+    tags = [str(tag).lower() for tag in market.get('tags', []) if tag is not None]
     
     # Keywords related to metals and commodities
     metals_keywords = [

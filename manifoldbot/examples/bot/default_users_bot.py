@@ -40,7 +40,6 @@ def main():
         users_to_monitor = [
             "BoltonBailey",    # macro/industrial questions tied to lithium production rankings
             "JoshDreckmeyr",   # frequent, clearly resolved gold (XAU/USD) price markets
-            "strutheo",        # longer-horizon gold markets framed for max price by date
             "postjawline",     # materials/science angles that touch copper
             "MikhailTal",      # chess and other markets
             "trevortaylor",    # additional user

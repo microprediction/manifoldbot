@@ -50,7 +50,7 @@ def main(trade_all=False):
         else:
             # Fallback to default list
             users_to_monitor = [
-                "BoltonBailey", "JoshDreckmeyr", "strutheo", "postjawline", "MikhailTal", "trevortaylor",
+                "BoltonBailey", "JoshDreckmeyr", "postjawline", "MikhailTal", "trevortaylor",
                 "neweconomicplan", "kian_spire", "mndrix", "Philip3773733"
             ]
         
