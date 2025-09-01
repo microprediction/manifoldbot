@@ -475,7 +475,7 @@ class ManifoldBot:
             TradingSession object
         """
         # Get all markets by the specified user (defaults to MikhailTal)
-        markets = self.reader.get_all_markets(username=username)
+        markets = self.reader.get_all_markets(usernames=username)
         # Limit to the specified number if requested
         if limit and len(markets) > limit:
             markets = markets[:limit]
@@ -506,7 +506,7 @@ class ManifoldBot:
         
         try:
             # Get all markets created by this user using the working method
-            markets = self.reader.get_all_markets(username=username)
+            markets = self.reader.get_all_markets(usernames=username)
             self.logger.info(f"Found {len(markets)} markets created by {username}")
             
             # Limit to the specified number if requested
