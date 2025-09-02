@@ -40,12 +40,15 @@ The LLM trading bot:
 - Places bets when there's a significant difference (≥5%)
 - Only bets when confidence is high (≥60%)
 
+## Is it quicker to use this package or just vibe from the start?
+I can't honestly say but this package does take care of things like careful iterative market-impact adjusted fractional Kelly betting and so forth. 
+
 ## More Examples
 
 See `manifoldbot/examples/` for additional examples:
 - `manifold/basic_reader.py` - Read market data (no API key needed)
 - `manifold/basic_writer.py` - Place bets manually
-- `bot/ai_optimist_trading_bot.py` - Simple rule-based bot
+- `bot/ai_optimist_trading_bot.py` - Simple rule-based bot that thinks people underestimate AI, generally
 
 ## Documentation
 
