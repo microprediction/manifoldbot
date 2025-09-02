@@ -14,16 +14,23 @@ from .config.settings import load_config
 # Core imports - these will be available when someone does `import manifoldbot`
 from .manifold.reader import ManifoldReader
 from .manifold.writer import ManifoldWriter
+from .manifold.comments import Comment, CommentReply, CommentGenerator
 from .manifold.bot import (
     ManifoldBot, DecisionMaker, MarketDecision, TradingSession,
     RandomDecisionMaker, KellyCriterionDecisionMaker, ConfidenceBasedDecisionMaker, LLMDecisionMaker
 )
+
+# AI integration
+from .ai.openai_client import analyze_market_with_gpt
 
 # Main exports
 __all__ = [
     "load_config",
     "ManifoldReader",
     "ManifoldWriter",
+    "Comment",
+    "CommentReply", 
+    "CommentGenerator",
     "ManifoldBot",
     "DecisionMaker",
     "MarketDecision",
@@ -32,6 +39,7 @@ __all__ = [
     "KellyCriterionDecisionMaker",
     "ConfidenceBasedDecisionMaker",
     "LLMDecisionMaker",
+    "analyze_market_with_gpt",
     "__version__",
     "__author__",
     "__email__",
