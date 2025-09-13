@@ -32,6 +32,9 @@ Or trade recent markets only:
 python -m manifoldbot.examples.bot.llm_trading_bot
 ```
 
+![](https://github.com/microprediction/manifoldbot/blob/main/docs/bot.png)
+
+
 ## What It Does
 
 The LLM trading bot:
