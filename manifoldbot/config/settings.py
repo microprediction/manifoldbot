@@ -131,12 +131,6 @@ def get_default_monitored_users() -> List[UserConfig]:
     """
     return [
         UserConfig(
-            username="BoltonBailey",
-            description="Macro/industrial questions tied to lithium production rankings and other econ tech topics",
-            specialties=["lithium production", "macro economics", "industrial technology", "commodities"],
-            example_market="Will the US be a top 3 lithium producer in 2033?"
-        ),
-        UserConfig(
             username="JoshDreckmeyr", 
             description="Frequent, clearly resolved gold (XAU/USD) price markets using standard data sources",
             specialties=["gold prices", "XAU/USD", "precious metals", "forex"],
