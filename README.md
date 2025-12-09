@@ -1,6 +1,6 @@
 # ManifoldBot
 
-A Python package for creating intelligent trading bots for Manifold Markets.
+A Python package for creating intelligent trading bots for Manifold Markets. See also some [improved repos](https://github.com/microprediction/manifoldbot/blob/main/ALTERNATIVES.md). 
 
 ## Quick Start
 
