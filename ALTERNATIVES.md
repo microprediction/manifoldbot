@@ -143,6 +143,26 @@ Below are community-built bots that take this pattern in different directions. F
 
 ---
 
+## `manifoldbot` (faizalmy)
+
+**Repo:** https://github.com/faizalmy/manifoldbot
+
+**What it is:** Multi-agent trading bot built on Google ADK (Agent Development Kit) with specialized agents for market analysis, risk assessment, and decision-making using consensus mechanisms.
+
+**Novelty vs `manifoldbot`:**
+
+- Multi-agent architecture with specialized agents (MarketAnalysisAgent, RiskAssessmentAgent, CoordinatorAgent) using Google ADK
+- Chain-of-thought reasoning with transparent, auditable decision-making
+- External data source integration (Exa, Perplexity, Tavily) for real-time information access
+- Consensus-based decision-making through weighted voting across agents
+- Production-ready features: continuous operation mode, graceful shutdown, configuration validation
+- Comprehensive performance tracking (realized/unrealized P&L, win rate, risk-adjusted metrics)
+- Model-agnostic LLM access via LiteLLM (OpenAI, Ollama) through Google ADK
+
+**Best for:** Users wanting a production-grade multi-agent system with external data integration and transparent reasoning.
+
+---
+
 ### Full list of alternatives (feel free to add more)
 
 - https://github.com/sachin-detrax/better_manifold_bot
@@ -153,3 +173,4 @@ Below are community-built bots that take this pattern in different directions. F
 - https://github.com/101jayjoshi-sudo/bot-
 - https://github.com/blackXmask/Manifold-Markets-Trading-Bot
 - https://github.com/Djmon007/mikhailtal-s-market-master
+- https://github.com/faizalmy/manifoldbot
