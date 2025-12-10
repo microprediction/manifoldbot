@@ -1,6 +1,6 @@
 # Alternatives / Derivative Manifold Bots
 
-This repository (`microprediction/manifoldbot`) is a general-purpose Python package for building Manifold trading bots, with examples such as an LLM trading bot that compares GPT-generated probabilities to market prices and bets using fractional Kelly sizing. :contentReference[oaicite:0]{index=0}  
+This repository (`microprediction/manifoldbot`) is a general-purpose Python package for building Manifold trading bots, with examples such as an LLM trading bot that compares GPT-generated probabilities to market prices and bets using fractional Kelly sizing.  
 
 Below are community-built bots that take this pattern in different directions. For each one, the focus is on **what’s novel relative to `manifoldbot`** rather than just re-implementing the same thing.
 
@@ -165,7 +165,7 @@ At the time of writing, this repo appears to be a **Lovable.dev web app scaffold
 
 ---
 
-
+### Full list of alternatives
 
 Some other packages that improve on this one (maybe). Please star them if you like them. 
 
