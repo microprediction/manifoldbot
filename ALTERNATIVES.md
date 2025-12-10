@@ -1,6 +1,10 @@
+
+
+
+
 # Alternatives / Derivative Manifold Bots
 
-This repository (`microprediction/manifoldbot`) is a general-purpose Python package for building Manifold trading bots, with examples such as an LLM trading bot that compares GPT-generated probabilities to market prices and bets using fractional Kelly sizing.  
+This repository (`microprediction/manifoldbot`) is a general-purpose Python package for building Manifold trading bots, with examples such as an LLM trading bot that compares GPT-generated probabilities to market prices and bets using fractional Kelly sizing. :contentReference[oaicite:0]{index=0}  
 
 Below are community-built bots that take this pattern in different directions. For each one, the focus is on **what’s novel relative to `manifoldbot`** rather than just re-implementing the same thing.
 
@@ -8,7 +12,7 @@ Below are community-built bots that take this pattern in different directions. F
 
 ## `better_manifold_bot` (sachin-detrax)
 
-**Repo:** <https://github.com/sachin-detrax/better_manifold_bot> 
+**Repo:** <https://github.com/sachin-detrax/better_manifold_bot> :contentReference[oaicite:1]{index=1}  
 
 **What it is:**  
 A “souped‑up” Manifold bot using a **multi‑signal ensemble** (historical performance, market microstructure, and an OpenAI LLM) to produce a single “true probability,” plus serious tooling for performance analysis.
@@ -31,7 +35,7 @@ A “souped‑up” Manifold bot using a **multi‑signal ensemble** (historical
 
 ## `ppbot-ai` (prathameshpatrawale)
 
-**Repo:** <https://github.com/prathameshpatrawale/ppbot-ai>   
+**Repo:** <https://github.com/prathameshpatrawale/ppbot-ai> :contentReference[oaicite:8]{index=8}  
 
 **What it is:**  
 A contest‑oriented bot built for the Manifold Featured Challenge, trading only in `MikhailTal`’s markets. It’s narrower in scope but simple and well‑structured.
@@ -53,7 +57,7 @@ A contest‑oriented bot built for the Manifold Featured Challenge, trading only
 
 ## `Manifoldbot-Ultra` (Sbha8282)
 
-**Repo:** <https://github.com/Sbha8282/Manifoldbot-Ultra>  
+**Repo:** <https://github.com/Sbha8282/Manifoldbot-Ultra> :contentReference[oaicite:14]{index=14}  
 
 **What it is:**  
 A **packaged, modular bot** designed as a clean Python package (`manifold_ultra_bot`) with dry‑run by default and optional LLM‑backed probabilities.
@@ -72,7 +76,7 @@ A **packaged, modular bot** designed as a clean Python package (`manifold_ultra_
 
 ## `TalOS-Manifold-Bot` (rodriguezramirezederdominic-web)
 
-**Repo:** <https://github.com/rodriguezramirezederdominic-web/TalOS-Manifold-Bot>  
+**Repo:** <https://github.com/rodriguezramirezederdominic-web/TalOS-Manifold-Bot> :contentReference[oaicite:20]{index=20}  
 
 **What it is:**  
 A self‑described **agentic** bot (TalOS) that uses GPT‑4 to read market text, perform reference‑class reasoning, and then bet using Fractional Kelly, targeted at `MikhailTal` markets.
@@ -93,7 +97,7 @@ A self‑described **agentic** bot (TalOS) that uses GPT‑4 to read market text
 
 ## `Best-Open-Source-Judgmental-Prediction-Python-Repository` (“Afaq”)
 
-**Repo:** <https://github.com/H-tech-AFAQ-CEO/Best-Open-Source-Judgmental-Prediction-Python-Repository>   
+**Repo:** <https://github.com/H-tech-AFAQ-CEO/Best-Open-Source-Judgmental-Prediction-Python-Repository> :contentReference[oaicite:25]{index=25}  
 
 **What it is:**  
 Despite the long name, the README describes a **Manifold Markets Trading Bot**: a clean modular Python bot focusing on `MikhailTal` markets with both simple and LLM strategies.
@@ -112,7 +116,7 @@ Despite the long name, the README describes a **Manifold Markets Trading Bot**: 
 
 ## `bot-` (“Joshi-Bot”, 101jayjoshi-sudo)
 
-**Repo:** <https://github.com/101jayjoshi-sudo/bot->  
+**Repo:** <https://github.com/101jayjoshi-sudo/bot-> :contentReference[oaicite:31]{index=31}  
 
 **What it is:**  
 A **lightweight `tal-manifold-bot` scaffold** that trades only `MikhailTal` markets using heuristics and optional local model hooks.
@@ -130,7 +134,7 @@ A **lightweight `tal-manifold-bot` scaffold** that trades only `MikhailTal` mark
 
 ## `Manifold-Markets-Trading-Bot` (blackXmask)
 
-**Repo:** <https://github.com/blackXmask/Manifold-Markets-Trading-Bot>  
+**Repo:** <https://github.com/blackXmask/Manifold-Markets-Trading-Bot> :contentReference[oaicite:36]{index=36}  
 
 **What it is:**  
 A **full trading “app”** for Manifold, not just a script: Streamlit GUI, portfolio analytics, arbitrage detection, and advanced AI strategies, again focused on `MikhailTal` markets.
@@ -149,7 +153,7 @@ A **full trading “app”** for Manifold, not just a script: Streamlit GUI, por
 
 ## `mikhailtal-s-market-master` (“dwashil”, Djmon007)
 
-**Repo:** <https://github.com/Djmon007/mikhailtal-s-market-master>  
+**Repo:** <https://github.com/Djmon007/mikhailtal-s-market-master> :contentReference[oaicite:42]{index=42}  
 
 **What it is (currently):**  
 At the time of writing, this repo appears to be a **Lovable.dev web app scaffold**: a Vite + TypeScript + React + Tailwind + shadcn‑ui front‑end template, with a README describing how to edit and deploy via Lovable. There is no documented bot logic or Manifold‑specific description yet. :contentReference[oaicite:43]{index=43}  
@@ -165,9 +169,17 @@ At the time of writing, this repo appears to be a **Lovable.dev web app scaffold
 
 ---
 
+
+
+
+
+
+
+
+
 ### Full list of alternatives
 
-Some other packages that improve on this one (maybe). Please star them if you like them. 
+Please add. 
 
 
 - [better_manifold_bot](https://github.com/sachin-detrax/better_manifold_bot)
