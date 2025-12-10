@@ -8,7 +8,7 @@ Below are community-built bots that take this pattern in different directions. F
 
 ## `better_manifold_bot` (sachin-detrax)
 
-**Repo:** <https://github.com/sachin-detrax/better_manifold_bot> :contentReference[oaicite:1]{index=1}  
+**Repo:** <https://github.com/sachin-detrax/better_manifold_bot> 
 
 **What it is:**  
 A “souped‑up” Manifold bot using a **multi‑signal ensemble** (historical performance, market microstructure, and an OpenAI LLM) to produce a single “true probability,” plus serious tooling for performance analysis.
