@@ -7,6 +7,27 @@ Below are community-built bots that take this pattern in different directions. F
 
 ---
 
+## TalBot
+
+**Repository**: https://github.com/Wingineers53/talbot
+
+**Manifold Profile**: https://manifold.markets/TalBotTrader
+
+A multi-strategy AI trading bot specializing in MikhailTal's markets with:
+
+- **Research-Augmented Prediction**: Uses web search (via Perplexity) to gather current information and identify information arbitrage opportunities
+- **Multi-Model Ensemble**: Combines predictions from multiple LLMs (GPT-4, Claude) with confidence-weighted averaging
+- **Market Microstructure Analysis**: Considers liquidity, time-to-close, and participation metrics
+- **Bayesian Kelly Sizing**: Confidence-adjusted position sizing with fractional Kelly criterion
+
+Key features:
+- Clean, modular Python architecture
+- Configurable trading parameters
+- Dry-run mode for testing
+- Continuous monitoring mode
+- Comprehensive logging with Rich console output
+
+---
 ## `better_manifold_bot` (sachin-detrax)
 
 **Repo:** https://github.com/sachin-detrax/better_manifold_bot
