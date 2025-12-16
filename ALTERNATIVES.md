@@ -6,7 +6,25 @@ This repository (`microprediction/manifoldbot`) is a general-purpose Python pack
 Below are community-built bots that take this pattern in different directions. For each one, the focus is on **what’s novel relative to `manifoldbot`** rather than just re-implementing the same thing.
 
 ---
+- [manifold_mikhail_bot] 
+repo: https://github.com/mostafazhrn/manifold_mikhail_bot
+A Python-based, GUI-enabled Manifold trading bot that targets markets created by
+MikhailTal, combining classical machine-learning models with LLM-based reasoning
+(local models or OpenAI API), optionally augmented with web-search analysis, to produce
+probability estimates and automated trades.
+Novelty vs manifoldbot:
+- Explicit ML training pipeline on resolved Manifold markets with per-option probability outputs
+- Probability calibration that respects and incorporates live market probabilities rather than ignoring them
+- Risk-aware final decision layer that blends ML estimates and LLM reasoning to gate and size trades conservatively
+- Optional reasoning layer using either local LLMs (via Ollama) or hosted APIs (e.g. OpenAI)
+- Web-search–augmented context gathering for markets with external information
+- GUI-first design for strategy configuration, live monitoring, and experimentation
+- Designed for extensibility beyond a single creator (default: MikhailTal)
 
+Best for: Users who want a flexible, GUI-driven Manifold bot that blends traditional ML
+with optional local or API-based LLM reasoning.
+
+---
 ## `better_manifold_bot` (sachin-detrax)
 
 **Repo:** https://github.com/sachin-detrax/better_manifold_bot
