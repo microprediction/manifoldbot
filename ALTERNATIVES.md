@@ -153,3 +153,4 @@ Below are community-built bots that take this pattern in different directions. F
 - https://github.com/101jayjoshi-sudo/bot-
 - https://github.com/blackXmask/Manifold-Markets-Trading-Bot
 - https://github.com/Djmon007/mikhailtal-s-market-master
+- https://github.com/st3vry/enhcmanifoldbot
