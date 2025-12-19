@@ -144,7 +144,7 @@ Below are community-built bots that take this pattern in different directions. F
 ---
 ## ContestMikhailBot (tanyat29)
 
-**Repo:** https://github.com/barbiet503/contest-mikhail-bot
+**Repo:** https://github.com/barbiet503-bot/Strategy_contest.git
 
 **What it is:**  
 A contest-focused Python trading bot built for the Manifold Featured
