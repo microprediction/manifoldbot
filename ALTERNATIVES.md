@@ -142,6 +142,24 @@ Below are community-built bots that take this pattern in different directions. F
 **Best for:** Starting point for a custom web UI or dashboard around a Manifold bot.
 
 ---
+## ContestMikhailBot (tanyat29)
+
+**Repo:** https://github.com/barbiet503/contest-mikhail-bot
+
+**What it is:**  
+A contest-focused Python trading bot built for the Manifold Featured
+Challenge, trading exclusively in markets created by **MikhailTal**.
+
+**Novelty vs manifoldbot:**
+- Strict creator-only market filtering (contest rules enforced)
+- Edge + soft momentum confirmation before trading
+- Risk-aware, capped position sizing
+- Per-market cooldowns and duplicate-trade protection
+- Clean, contest-grade logging and CSV outputs
+
+**Best for:**  
+Contest participants seeking a disciplined, explainable, and stable
+Manifold trading bot rather than aggressive or overfitted strategies.
 
 ### Full list of alternatives (feel free to add more)
 
@@ -153,3 +171,4 @@ Below are community-built bots that take this pattern in different directions. F
 - https://github.com/101jayjoshi-sudo/bot-
 - https://github.com/blackXmask/Manifold-Markets-Trading-Bot
 - https://github.com/Djmon007/mikhailtal-s-market-master
+- https://github.com/barbiet503/contest-mikhail-bot
