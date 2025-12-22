@@ -174,3 +174,4 @@ directly targeting the overbetting failure mode common in thin or ambiguous mark
 - https://github.com/101jayjoshi-sudo/bot-
 - https://github.com/blackXmask/Manifold-Markets-Trading-Bot
 - https://github.com/Djmon007/mikhailtal-s-market-master
+- https://github.com/jinanmh123/eliteBot/
