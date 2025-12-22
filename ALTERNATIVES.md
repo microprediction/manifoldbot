@@ -7,6 +7,27 @@ Below are community-built bots that take this pattern in different directions. F
 
 ---
 
+## `eliteBot` (jinanmh123)
+
+**Repo:** https://github.com/jinanmh123/eliteBot/
+
+**What it is:** A fully agentic hybrid Manifold trading bot, cleanly separating LLM-based semantic reasoning from quantitative decision-making, with regime-aware execution, volatility-adjusted Kelly sizing, realistic backtesting. Addressing key failure modes: (1) overconfident LLM probabilities, (2) purely technical strategies that miss semantic signals, (3) naive fractional Kelly overbetting in thin or unstable markets. Trading `MikhailTal` markets.
+
+**Novelty vs `manifoldbot`:**
+
+- Hybrid, but with hard safety boundaries: LLMs handle semantics only (language, evidence, uncertainty, blind spots), Technical models handle behavior only (price, volume, volatility)
+- LLMs are forbidden from outputting probabilities, prices, or bet sizes. Agentic semantic reasoning without numeric authority
+Six-stage LLM pipeline (normalization, classification, base-rate context, evidence decomposition, uncertainty, constraints)
+Outputs are ordinal, schema-locked, cached, and deterministically mapped downstream, preventing hallucinated confidence and feedback loops
+- Regime-aware signal fusion: Markets are classified as information-driven, noise-driven, or mixed, and this regime dynamically bounds how much semantic (LLM) versus technical evidence is trusted, preventing runaway conviction in ambiguous or noisy markets.
+- Volatility- & uncertainty-aware Kelly sizing: explicitly scales bet size with Realized volatility, Liquidity, Aggregate model uncertainty and Market regime
+directly targeting the overbetting failure mode common in thin or ambiguous markets.
+- Execution and backtesting realism: Regime-dependent execution; Time-ordered replay backtester with slippage and delay modeling; Reports ROI, drawdown, Sharpe, and Brier calibration (no hindsight)
+
+**Best for:** Users who want a robust hybrid system that captures market semantics without trusting LLMs with money, and sizes risk using volatility and uncertainty rather than edge alone.
+
+---
+
 ## `better_manifold_bot` (sachin-detrax)
 
 **Repo:** https://github.com/sachin-detrax/better_manifold_bot
