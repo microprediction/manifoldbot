@@ -145,6 +145,10 @@ Below are community-built bots that take this pattern in different directions. F
 
 ### Full list of alternatives (feel free to add more)
 
+- https://github.com/mostafazhrn/manifold_mikhail_bot
+- https://github.com/barbiet503-bot/Strategy_contest.git
+- https://github.com/Wingineers53/talbot
+- https://github.com/peekcoding/manifoldbotpro
 - https://github.com/sachin-detrax/better_manifold_bot
 - https://github.com/prathameshpatrawale/ppbot-ai
 - https://github.com/Sbha8282/Manifoldbot-Ultra
