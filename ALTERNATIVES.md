@@ -1,9 +1,57 @@
 
+[- https://github.com/<your-username>/mikhailtal-manifold-agent](https://github.com/Md-Shafiur-Rahman-khan/mikhailtal-manifold-agent)
+  Python agent trading exclusively on MikhailTal markets using calibrated probabilities and Kelly sizing.
+
+
+
+
+
 # Alternatives / Derivative Manifold Bots
 
 This repository (`microprediction/manifoldbot`) is a general-purpose Python package for building Manifold trading bots, with examples such as an LLM trading bot that compares GPT-generated probabilities to market prices and bets using fractional Kelly sizing.
 
 Below are community-built bots that take this pattern in different directions. For each one, the focus is on **what’s novel relative to `manifoldbot`** rather than just re-implementing the same thing.
+
+---
+## manifold_mikhail_bot
+Repo: https://github.com/mostafazhrn/manifold_mikhail_bot
+
+**What it is:**  
+A Python-based, GUI-enabled Manifold trading bot that targets markets created by MikhailTal,  
+combining classical machine-learning models with LLM-based reasoning (local models or OpenAI API),  
+optionally augmented with web-search analysis, to produce probability estimates and automated trades.
+
+#### Novelty vs manifoldbot:
+- Explicit ML training pipeline on resolved Manifold markets with per-option probability outputs
+- Probability calibration that respects and incorporates live market probabilities rather than ignoring them
+- Risk-aware final decision layer that blends ML estimates and LLM reasoning to gate and size trades conservatively
+- Optional reasoning layer using either local LLMs (via Ollama) or hosted APIs (e.g. OpenAI)
+- Web-search–augmented context gathering for markets with external information
+- GUI-first design for strategy configuration, live monitoring, and experimentation
+- Designed for extensibility beyond a single creator (default: MikhailTal)
+
+**Best for:**  
+Users who want a flexible, GUI-driven Manifold bot that blends traditional machine learning  
+with optional local or API-based LLM reasoning.
+
+## `eliteBot` (jinanmh123)
+
+**Repo:** https://github.com/jinanmh123/eliteBot/
+
+**What it is:** A fully agentic hybrid Manifold trading bot, cleanly separating LLM-based semantic reasoning from quantitative decision-making, with regime-aware execution, volatility-adjusted Kelly sizing, realistic backtesting. Addressing key failure modes: (1) overconfident LLM probabilities, (2) purely technical strategies that miss semantic signals, (3) naive fractional Kelly overbetting in thin or unstable markets. Trading `MikhailTal` markets.
+
+**Novelty vs `manifoldbot`:**
+
+- Hybrid, but with hard safety boundaries: LLMs handle semantics only (language, evidence, uncertainty, blind spots), Technical models handle behavior only (price, volume, volatility)
+- LLMs are forbidden from outputting probabilities, prices, or bet sizes. Agentic semantic reasoning without numeric authority
+Six-stage LLM pipeline (normalization, classification, base-rate context, evidence decomposition, uncertainty, constraints)
+Outputs are ordinal, schema-locked, cached, and deterministically mapped downstream, preventing hallucinated confidence and feedback loops
+- Regime-aware signal fusion: Markets are classified as information-driven, noise-driven, or mixed, and this regime dynamically bounds how much semantic (LLM) versus technical evidence is trusted, preventing runaway conviction in ambiguous or noisy markets.
+- Volatility- & uncertainty-aware Kelly sizing: explicitly scales bet size with Realized volatility, Liquidity, Aggregate model uncertainty and Market regime
+directly targeting the overbetting failure mode common in thin or ambiguous markets.
+- Execution and backtesting realism: Regime-dependent execution; Time-ordered replay backtester with slippage and delay modeling; Reports ROI, drawdown, Sharpe, and Brier calibration (no hindsight)
+
+**Best for:** Users who want a robust hybrid system that captures market semantics without trusting LLMs with money, and sizes risk using volatility and uncertainty rather than edge alone.
 
 ---
 
@@ -142,9 +190,53 @@ Below are community-built bots that take this pattern in different directions. F
 **Best for:** Starting point for a custom web UI or dashboard around a Manifold bot.
 
 ---
+## ContestMikhailBot (tanyat29)
+
+**Repo:** https://github.com/barbiet503-bot/Strategy_contest.git
+
+**What it is:**  
+A contest-focused Python trading bot built for the Manifold Featured
+Challenge, trading exclusively in markets created by **MikhailTal**.
+
+**Novelty vs manifoldbot:**
+- Strict creator-only market filtering (contest rules enforced)
+- Edge + soft momentum confirmation before trading
+- Risk-aware, capped position sizing
+- Per-market cooldowns and duplicate-trade protection
+- Clean, contest-grade logging and CSV outputs
+
+**Best for:**  
+Contest participants seeking a disciplined, explainable, and stable
+Manifold trading bot rather than aggressive or overfitted strategies.
+
+## `manifoldbot` (faizalmy)
+
+**Repo:** https://github.com/faizalmy/manifoldbot
+
+**What it is:** Multi-agent trading bot built on Google ADK (Agent Development Kit) with specialized agents for market analysis, risk assessment, and decision-making using consensus mechanisms.
+
+**Novelty vs `manifoldbot`:**
+
+- Multi-agent architecture with specialized agents (MarketAnalysisAgent, RiskAssessmentAgent, CoordinatorAgent) using Google ADK
+- Chain-of-thought reasoning with transparent, auditable decision-making
+- External data source integration (Exa, Perplexity, Tavily) for real-time information access
+- Consensus-based decision-making through weighted voting across agents
+- Production-ready features: continuous operation mode, graceful shutdown, configuration validation
+- Comprehensive performance tracking (realized/unrealized P&L, win rate, risk-adjusted metrics)
+- Model-agnostic LLM access via LiteLLM (OpenAI, Ollama) through Google ADK
+
+**Best for:** Users wanting a production-grade multi-agent system with external data integration and transparent reasoning.
+
+---
 
 ### Full list of alternatives (feel free to add more)
 
+- 
+- https://github.com/Djmon007/mikhailtal-s-market-master.git
+- https://github.com/mostafazhrn/manifold_mikhail_bot
+- https://github.com/barbiet503-bot/Strategy_contest.git
+- https://github.com/Wingineers53/talbot
+- https://github.com/peekcoding/manifoldbotpro
 - https://github.com/sachin-detrax/better_manifold_bot
 - https://github.com/prathameshpatrawale/ppbot-ai
 - https://github.com/Sbha8282/Manifoldbot-Ultra
@@ -153,4 +245,4 @@ Below are community-built bots that take this pattern in different directions. F
 - https://github.com/101jayjoshi-sudo/bot-
 - https://github.com/blackXmask/Manifold-Markets-Trading-Bot
 - https://github.com/Djmon007/mikhailtal-s-market-master
-- https://github.com/st3vry/enhcmanifoldbot
+- https://github.com/jinanmh123/eliteBot/
