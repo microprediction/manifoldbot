@@ -1,4 +1,11 @@
 
+[- https://github.com/<your-username>/mikhailtal-manifold-agent](https://github.com/Md-Shafiur-Rahman-khan/mikhailtal-manifold-agent)
+  Python agent trading exclusively on MikhailTal markets using calibrated probabilities and Kelly sizing.
+
+
+
+
+
 # Alternatives / Derivative Manifold Bots
 
 This repository (`microprediction/manifoldbot`) is a general-purpose Python package for building Manifold trading bots, with examples such as an LLM trading bot that compares GPT-generated probabilities to market prices and bets using fractional Kelly sizing.
