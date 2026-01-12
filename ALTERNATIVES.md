@@ -145,6 +145,8 @@ Below are community-built bots that take this pattern in different directions. F
 
 ### Full list of alternatives (feel free to add more)
 
+- 
+- https://github.com/Djmon007/mikhailtal-s-market-master.git
 - https://github.com/mostafazhrn/manifold_mikhail_bot
 - https://github.com/barbiet503-bot/Strategy_contest.git
 - https://github.com/Wingineers53/talbot
